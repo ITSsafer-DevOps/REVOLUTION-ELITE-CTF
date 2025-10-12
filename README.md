@@ -186,14 +186,3 @@ Dokument pripravil Kristián Kašník v roku 2025, všetky práva vyhradené.
 
 ---
 ```
-
-Zdroje
-[1] Free Penetration Test Report Templates https://pentestreports.com/templates
-[2] Pentest reports with markdown and pandoc? : r/AskNetsec https://www.reddit.com/r/AskNetsec/comments/98f6si/pentest_reports_with_markdown_and_pandoc/
-[3] blacklanternsecurity/writehat: A pentest reporting tool ... https://github.com/blacklanternsecurity/writehat
-[4] Offensive Security Experienced Penetration Tester Exam Report https://noraj.github.io/OSCP-Exam-Report-Template-Markdown/src/OSEP-exam-report-template_ceso_v1.html
-[5] Penetration Test Report Generator - adamchovanec.cz https://www.adamchovanec.cz/projects/pentest-report-generator/
-[6] VAPT Reports - Samples, Examples & Templates https://cybersierra.co/blog/vapt-reports-samples-examples-templates/
-[7] Offensive Security Exam Report Template in Markdown https://noraj.github.io/OSCP-Exam-Report-Template-Markdown/
-[8] SysReptor Pentest Report Creator - SysReptor https://docs.sysreptor.com
-[9] Top Penetration Testing Report Templates in 2025 https://www.msppentesting.com/blog-posts/penetration-testing-report-templates
