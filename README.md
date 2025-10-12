@@ -1,20 +1,28 @@
 ---
-title: Penetračný test - REVOLUTION ELITE
+title: Penetračný Test REVOLUTION ELITE - Kompletný Report
 ---
 
-<!-- Presmerovanie na externý link -->
 <meta http-equiv="refresh" content="0; url=https://itssafer-devops.github.io/REVOLUTION-ELITE-CTF/pentest-report.html" />
 
-# Penetračný test - REVOLUTION ELITE
+# Penetračný Test REVOLUTION ELITE
 
-Tento dokument je stručným zhrnutím penetrančného testu webovej aplikácie REVOLUTION ELITE, ktorý bol vykonaný s cieľom odhaliť a zneužiť bezpečnostné zraniteľnosti cieľového systému. 
-
-Test bol realizovaný systematickým prístupom podľa metodológií OWASP WSTG, NIST SP 800-115 a PTES s cieľom získať plnú kontrolu nad systémom a extrahovať CTF vlajku ako dôkaz úspešnej kompromitácie.
-
-Výsledky testu ukázali kritické zraniteľnosti vrátane SQL injection, obchodu autentifikácie, prítomnosti backdooru, path traversal a ďalších. Testovanie potvrdilo úplnú kontrolu nad databázou, root prístup k súborovému systému a zachytenie CTF vlajky.
+Tento dokument obsahuje kompletný report systematického penetračného testu webovej aplikácie *REVOLUTION ELITE*. Cieľom bolo identifikovať a využiť bezpečnostné zraniteľnosti na získanie plnej kontroly nad systémom a extrahovať CTF vlajku.
 
 ---
 
-Podrobné informácie a kompletná správa je dostupná na:
+## Testované Prostredie
 
-[Penetračný report REVOLUTION ELITE](https://itssafer-devops.github.io/REVOLUTION-ELITE-CTF/pentest-report.html)
+| Parameter          | Hodnota                                 |
+|--------------------|----------------------------------------|
+| Cieľová aplikácia  | Revolution Elite                       |
+| Doména             | revolutionelite.co.uk                  |
+| IP adresa servera  | 172.31.16.8/24                        |
+| Operačný systém    | Debian GNU/Linux 12 (Bookworm)         |
+| Webový stack       | Apache 2.4 + PHP 8.1 + MySQL 8.0.34  |
+| Dátum testovania   | 16. august 2025                        |
+| Metodológia        | OWASP WSTG, NIST SP 800-115, PTES     |
+
+---
+
+## Mapa Útočnej Plochy a Kompromitácie
+
