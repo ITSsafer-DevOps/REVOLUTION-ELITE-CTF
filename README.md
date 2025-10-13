@@ -11,25 +11,25 @@ https://itssafer-devops.github.io/REVOLUTION-ELITE-CTF/pentest-report.html
 
 | Key Indicator | Status |
 | :--- | :--- |
-| **System** | [span_4](start_span)[span_5](start_span)Fully Compromised[span_4](end_span)[span_5](end_span) |
-| **Database** | [span_6](start_span)[span_7](start_span)Full Access (MySQL 8.0.34)[span_6](end_span)[span_7](end_span) |
+| **System** | [span_4](start_span)Fully Compromised[span_4](end_span) |
+| **Database** | [span_5](start_span)[span_6](start_span)[span_7](start_span)Full Access (MySQL 8.0.34)[span_5](end_span)[span_6](end_span)[span_7](end_span) |
 | **Admin Access** | [span_8](start_span)Full Control[span_8](end_span) |
 | **CTF Flag** | [span_9](start_span)[span_10](start_span)[span_11](start_span)Captured[span_9](end_span)[span_10](end_span)[span_11](end_span) |
 
-**[span_12](start_span)[span_13](start_span)Captured CTF Flag:** `CTF{x3v0lut10n_3l11t3_r00t_compr0m1s3d}` (Extracted from `/root/.secret_notes.txt`)[span_12](end_span)[span_13](end_span).
+**[span_12](start_span)[span_13](start_span)[span_14](start_span)Captured CTF Flag:** `CTF{x3v0lut10n_3l1t3_r00t_compr0m1s3d}` (Extracted from `/root/.secret_notes.txt`)[span_12](end_span)[span_13](end_span)[span_14](end_span).
 
 ## Tested Environment
 
 | Parameter | Value |
 | :--- | :--- |
-| **Target Application** | [span_14](start_span)Revolution Elite[span_14](end_span) |
-| **[span_15](start_span)Domain** | revolutionelite.co.uk[span_15](end_span) |
-| **Server IP Address** | [span_16](start_span)$172.31.16.8/24$[span_16](end_span) |
-| **Operating System** | [span_17](start_span)Debian GNU/Linux 12 (Bookworm)[span_17](end_span) |
-| **Web Stack** | [span_18](start_span)Apache 2.4 + PHP 8.1 + MySQL 8.0.34[span_18](end_span) |
-| **Testing Date** | [span_19](start_span)[span_20](start_span)August 16, 2025[span_19](end_span)[span_20](end_span) |
-| **Methodology** | [span_21](start_span)OWASP WSTG, NIST SP 800-115, PTES[span_21](end_span) |
-| **Penetration Tester** | [span_22](start_span)[span_23](start_span)Kristián Kašník (ITSsafer DevOps)[span_22](end_span)[span_23](end_span) |
+| **Target Application** | [span_15](start_span)Revolution Elite[span_15](end_span) |
+| **[span_16](start_span)Domain** | revolutionelite.co.uk[span_16](end_span) |
+| **Server IP Address** | [span_17](start_span)$172.31.16.8/24$[span_17](end_span) |
+| **Operating System** | [span_18](start_span)Debian GNU/Linux 12 (Bookworm)[span_18](end_span) |
+| **Web Stack** | [span_19](start_span)Apache 2.4 + PHP 8.1 + MySQL 8.0.34[span_19](end_span) |
+| **Testing Date** | [span_20](start_span)[span_21](start_span)August 16, 2025[span_20](end_span)[span_21](end_span) |
+| **Methodology** | [span_22](start_span)OWASP WSTG, NIST SP 800-115, PTES[span_22](end_span) |
+| **Penetration Tester** | [span_23](start_span)Kristián Kašník (ITSsafer DevOps)[span_23](end_span) |
 
 ## Identified and Exploited Vulnerabilities
 
@@ -49,7 +49,7 @@ https://itssafer-devops.github.io/REVOLUTION-ELITE-CTF/pentest-report.html
 
 ```mermaid
 graph TD
-    A[HACKER: Kostas Kalink] --> B(VULNERABILITY TESTING);
+    A[HACKER: Kristian Kasnik] --> B(VULNERABILITY TESTING);
 
     B --> C{SQL INJECTION CVSS 9.8 EXPLOITED};
     B --> D{AUTH BYPASS CVSS 10.0 ACTIVE};
